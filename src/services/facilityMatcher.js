@@ -7,6 +7,7 @@ const MOCK_FACILITIES = [
     id: 'fac-001',
     name: 'SafeWaste Disposal LLC',
     epaId: 'TXD987654321',
+    state: 'TX',
     address: '1234 Industrial Pkwy, Houston, TX 77002',
     acceptedWasteCodes: ['D001', 'D002', 'D003', 'F001', 'F002', 'F003'],
     capabilities: ['incineration', 'chemical-treatment', 'stabilization'],
@@ -20,6 +21,7 @@ const MOCK_FACILITIES = [
     id: 'fac-002',
     name: 'HazardPro Environmental Services',
     epaId: 'TXD123456789',
+    state: 'TX',
     address: '5678 Waste Management Dr, Dallas, TX 75201',
     acceptedWasteCodes: [
       'D001',
@@ -41,6 +43,7 @@ const MOCK_FACILITIES = [
     id: 'fac-003',
     name: 'GreenCycle Waste Solutions',
     epaId: 'TXD555666777',
+    state: 'TX',
     address: '9012 Environmental Way, Austin, TX 78701',
     acceptedWasteCodes: ['D001', 'D002', 'F001', 'F003', 'U001'],
     capabilities: ['recycling', 'chemical-treatment', 'distillation'],
@@ -54,6 +57,7 @@ const MOCK_FACILITIES = [
     id: 'fac-004',
     name: 'ToxicGuard Treatment Center',
     epaId: 'TXD888999000',
+    state: 'TX',
     address: '3456 Safety Blvd, San Antonio, TX 78201',
     acceptedWasteCodes: [
       'D003',
@@ -71,6 +75,154 @@ const MOCK_FACILITIES = [
     location: { lat: 29.4241, lng: -98.4936 },
     rating: 4.3,
   },
+  {
+    id: 'fac-005',
+    name: 'EcoSafe Waste Management',
+    epaId: 'CAD111222333',
+    state: 'CA',
+    address: '7890 Industrial Way, Los Angeles, CA 90001',
+    acceptedWasteCodes: [
+      'D001',
+      'D002',
+      'D003',
+      'F001',
+      'F002',
+      'F003',
+      'U001',
+    ],
+    capabilities: [
+      'incineration',
+      'chemical-treatment',
+      'recycling',
+      'stabilization',
+    ],
+    pricePerKg: 3.2,
+    maxCapacityKg: 120000,
+    certificationExpiry: '2027-12-31',
+    location: { lat: 34.0522, lng: -118.2437 },
+    rating: 4.8,
+  },
+  {
+    id: 'fac-006',
+    name: 'Pacific Hazard Solutions',
+    epaId: 'CAD444555666',
+    state: 'CA',
+    address: '4567 Bay Area Blvd, San Francisco, CA 94102',
+    acceptedWasteCodes: ['D004', 'D005', 'D006', 'D007', 'D008', 'D009'],
+    capabilities: ['metal-recovery', 'stabilization', 'secure-landfill'],
+    pricePerKg: 3.8,
+    maxCapacityKg: 80000,
+    certificationExpiry: '2028-06-30',
+    location: { lat: 37.7749, lng: -122.4194 },
+    rating: 4.6,
+  },
+  {
+    id: 'fac-007',
+    name: 'Metro Environmental Services',
+    epaId: 'NYD777888999',
+    state: 'NY',
+    address: '1234 Industrial Park, Brooklyn, NY 11201',
+    acceptedWasteCodes: ['D001', 'D002', 'D003', 'F001', 'F003'],
+    capabilities: ['chemical-treatment', 'stabilization', 'incineration'],
+    pricePerKg: 4.0,
+    maxCapacityKg: 60000,
+    certificationExpiry: '2026-09-30',
+    location: { lat: 40.6782, lng: -73.9442 },
+    rating: 4.4,
+  },
+  {
+    id: 'fac-008',
+    name: 'Northeast Waste Control',
+    epaId: 'NYD123123123',
+    state: 'NY',
+    address: '9876 Hudson Valley Pkwy, Albany, NY 12084',
+    acceptedWasteCodes: ['D004', 'D005', 'D006', 'D007', 'D008', 'D009'],
+    capabilities: ['metal-recovery', 'stabilization', 'landfill'],
+    pricePerKg: 3.6,
+    maxCapacityKg: 90000,
+    certificationExpiry: '2027-03-31',
+    location: { lat: 42.6526, lng: -73.7562 },
+    rating: 4.5,
+  },
+  {
+    id: 'fac-009',
+    name: 'Sunshine State Waste Solutions',
+    epaId: 'FLD456456456',
+    state: 'FL',
+    address: '3210 Coastal Hwy, Miami, FL 33101',
+    acceptedWasteCodes: ['D001', 'D002', 'D003', 'F001', 'F002', 'U001'],
+    capabilities: ['recycling', 'chemical-treatment', 'distillation'],
+    pricePerKg: 2.8,
+    maxCapacityKg: 70000,
+    certificationExpiry: '2027-08-31',
+    location: { lat: 25.7617, lng: -80.1918 },
+    rating: 4.6,
+  },
+  {
+    id: 'fac-010',
+    name: 'Great Lakes Environmental',
+    epaId: 'ILD789789789',
+    state: 'IL',
+    address: '5678 Manufacturing Dr, Chicago, IL 60601',
+    acceptedWasteCodes: [
+      'D001',
+      'D002',
+      'D003',
+      'D004',
+      'D005',
+      'D006',
+      'D007',
+      'D008',
+      'D009',
+    ],
+    capabilities: [
+      'incineration',
+      'metal-recovery',
+      'stabilization',
+      'chemical-treatment',
+    ],
+    pricePerKg: 3.4,
+    maxCapacityKg: 110000,
+    certificationExpiry: '2028-12-31',
+    location: { lat: 41.8781, lng: -87.6298 },
+    rating: 4.7,
+  },
+  {
+    id: 'fac-011',
+    name: 'Rocky Mountain Hazardous Waste',
+    epaId: 'COD321321321',
+    state: 'CO',
+    address: '7890 Mountain View Rd, Denver, CO 80202',
+    acceptedWasteCodes: ['D001', 'D002', 'D003', 'F001', 'F002', 'F003'],
+    capabilities: ['incineration', 'stabilization', 'secure-landfill'],
+    pricePerKg: 3.1,
+    maxCapacityKg: 65000,
+    certificationExpiry: '2027-05-31',
+    location: { lat: 39.7392, lng: -104.9903 },
+    rating: 4.5,
+  },
+  {
+    id: 'fac-012',
+    name: 'Atlantic Waste Control',
+    epaId: 'GAD654654654',
+    state: 'GA',
+    address: '4321 Peachtree Industrial, Atlanta, GA 30303',
+    acceptedWasteCodes: [
+      'D004',
+      'D005',
+      'D006',
+      'D007',
+      'D008',
+      'D009',
+      'U001',
+    ],
+    capabilities: ['metal-recovery', 'stabilization', 'chemical-treatment'],
+    pricePerKg: 2.9,
+    maxCapacityKg: 85000,
+    certificationExpiry: '2028-02-28',
+    location: { lat: 33.749, lng: -84.388 },
+    rating: 4.6,
+  },
 ];
 
 export async function findApprovedFacilities(wasteProfile, options = {}) {
@@ -78,10 +230,11 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
     traceId = `facility-${Date.now()}`,
     maxResults = 10,
     sortBy = 'price',
+    states = null,
   } = options;
 
   logger.info(
-    { traceId, wasteCode: wasteProfile.wasteCode },
+    { traceId, wasteCode: wasteProfile.wasteCode, states },
     'Finding approved disposal facilities'
   );
 
@@ -98,8 +251,9 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
     const hasCapacity =
       !wasteProfile.quantityKg ||
       facility.maxCapacityKg >= wasteProfile.quantityKg;
+    const matchesState = !states || states.includes(facility.state);
 
-    return acceptsWasteCode && isCertified && hasCapacity;
+    return acceptsWasteCode && isCertified && hasCapacity && matchesState;
   });
 
   facilities = facilities.map((facility) => {
@@ -261,4 +415,12 @@ export function getAllFacilities() {
 
 export function getFacilityById(facilityId) {
   return MOCK_FACILITIES.find((f) => f.id === facilityId) || null;
+}
+
+export function getFacilitiesByState(state) {
+  return MOCK_FACILITIES.filter((f) => f.state === state);
+}
+
+export function getAvailableStates() {
+  return [...new Set(MOCK_FACILITIES.map((f) => f.state))].sort();
 }
