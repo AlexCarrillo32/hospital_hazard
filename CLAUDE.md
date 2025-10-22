@@ -174,6 +174,64 @@ Use EPA and industry-standard terminology consistently:
 - Never log sensitive client data (chemical formulas, facility names) in plain text
 - Encrypt all waste profile documents at rest and in transit
 
+## AI Operations (AIOps) Best Practices
+
+### 8 — Instrumentation & Logging
+
+- **I-1 (MUST)** Log all AI prompts, outputs, and costs with trace IDs for debugging.
+- **I-2 (MUST)** Sanitize PII from logs before storing (emails, SSNs, IDs).
+- **I-3 (SHOULD)** Track per-model metrics: request count, token usage, latency, cost.
+- **I-4 (MUST)** Include model name, temperature, and token limits in prompt logs.
+- **I-5 (SHOULD)** Calculate and log costs using current model pricing.
+
+### 9 — Evaluation & Testing
+
+- **E-1 (MUST)** Maintain offline test sets for regression testing AI outputs.
+- **E-2 (SHOULD)** Run A/B tests when comparing model versions or prompts.
+- **E-3 (MUST)** Define success criteria and thresholds for each test case.
+- **E-4 (SHOULD)** Use domain-specific evaluation metrics (e.g., EPA code accuracy).
+- **E-5 (SHOULD)** Record A/B test results before declaring a winner (min 100 samples).
+
+### 10 — Safety & Filtering
+
+- **S-1 (MUST)** Filter inputs for jailbreak attempts before sending to model.
+- **S-2 (MUST)** Detect and scrub PII from both inputs and outputs.
+- **S-3 (SHOULD)** Assess toxicity/harmful content in user inputs.
+- **S-4 (MUST)** Log all safety violations with severity levels.
+- **S-5 (SHOULD)** Maintain allow/deny lists for sensitive topics.
+
+### 11 — Reliability
+
+- **R-1 (MUST)** Implement exponential backoff retry logic for transient failures.
+- **R-2 (SHOULD)** Cache expensive AI operations with appropriate TTL.
+- **R-3 (SHOULD)** Use shadow deployments to test new models without user impact.
+- **R-4 (MUST)** Set timeouts for all model API calls.
+- **R-5 (SHOULD)** Batch requests when possible to improve throughput.
+
+### 12 — Lifecycle Management
+
+- **L-1 (MUST)** Monitor model drift by tracking accuracy/confidence over time.
+- **L-2 (SHOULD)** Define retraining triggers (e.g., accuracy drops >15%).
+- **L-3 (MUST)** Establish baseline metrics with initial 100+ samples.
+- **L-4 (SHOULD)** Check drift at regular intervals (e.g., every 5 minutes).
+- **L-5 (MUST)** Alert when retraining triggers activate.
+
+### 13 — Cost & Performance Optimization
+
+- **O-1 (MUST)** Set daily/monthly cost budgets and enforce them.
+- **O-2 (SHOULD)** Route requests to appropriate models based on complexity.
+- **O-3 (SHOULD)** Use cheaper/faster models for simple tasks.
+- **O-4 (MUST)** Track cost per request and optimize expensive operations.
+- **O-5 (SHOULD)** Implement request batching to reduce API overhead.
+
+### 14 — Agent Orchestration
+
+- **A-1 (MUST)** Define workflows as declarative step configurations.
+- **A-2 (SHOULD)** Support retry logic per-step for resilient workflows.
+- **A-3 (SHOULD)** Execute independent agents in parallel when possible.
+- **A-4 (MUST)** Log execution traces with step-level granularity.
+- **A-5 (SHOULD)** Provide execution status endpoints for monitoring.
+
 ## Remember Shortcuts
 
 ### QNEW
