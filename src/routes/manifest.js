@@ -1,8 +1,5 @@
 import express from 'express';
-import {
-  createManifest,
-  trackManifest,
-} from '../services/manifestGenerator.js';
+import { createManifest, trackManifest } from '../services/manifestGenerator.js';
 
 const router = express.Router();
 
@@ -11,15 +8,13 @@ router.post('/', async (req, res, next) => {
     const { wasteProfile, facility, route } = req.body;
 
     if (!wasteProfile || !facility || !route) {
-      return res
-        .status(400)
-        .json({ error: 'Waste profile, facility, and route are required' });
+      return res.status(400).json({ error: 'Waste profile, facility, and route are required' });
     }
 
     const manifest = await createManifest(wasteProfile, facility, route);
-    res.status(201).json(manifest);
+    return res.status(201).json(manifest);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 

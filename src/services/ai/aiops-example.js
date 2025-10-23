@@ -97,10 +97,7 @@ export async function classifyWasteWithAIOps(labReportText, userId) {
   });
 
   if (!inputSafetyCheck.safe) {
-    logger.error(
-      { traceId, issues: inputSafetyCheck.issues },
-      'Input failed safety check'
-    );
+    logger.error({ traceId, issues: inputSafetyCheck.issues }, 'Input failed safety check');
     throw new Error('Input contains unsafe content');
   }
 
@@ -111,17 +108,10 @@ export async function classifyWasteWithAIOps(labReportText, userId) {
     documentSize: labReportText.length,
   });
 
-  const budgetCheck = optimizer.checkBudget(
-    'daily-ai-budget',
-    0.5,
-    labReportText.length / 4
-  );
+  const budgetCheck = optimizer.checkBudget('daily-ai-budget', 0.5, labReportText.length / 4);
 
   if (!budgetCheck.allowed) {
-    logger.error(
-      { traceId, reason: budgetCheck.reason },
-      'Budget limit exceeded'
-    );
+    logger.error({ traceId, reason: budgetCheck.reason }, 'Budget limit exceeded');
     throw new Error(`Budget limit exceeded: ${budgetCheck.reason}`);
   }
 
@@ -148,41 +138,32 @@ export async function classifyWasteWithAIOps(labReportText, userId) {
     return mockResult;
   };
 
-  const { result: classificationResult } =
-    await reliabilityLayer.executeWithReliability(classificationFn, {
+  const { result: classificationResult } = await reliabilityLayer.executeWithReliability(
+    classificationFn,
+    {
       traceId,
       cacheKey: `waste-classify-${Buffer.from(labReportText).toString('base64').slice(0, 32)}`,
       cacheTtlMs: 3600000,
       enableCache: true,
       enableRetry: true,
-    });
-
-  const outputSafetyCheck = await safetyLayer.filterOutput(
-    JSON.stringify(classificationResult),
-    { traceId }
-  );
-
-  if (!outputSafetyCheck.safe) {
-    logger.error(
-      { traceId, issues: outputSafetyCheck.issues },
-      'Output failed safety check'
-    );
-  }
-
-  lifecycleManager.recordMetric(
-    'accuracy-drift',
-    classificationResult.confidence,
-    {
-      wasteCode: classificationResult.wasteCode,
     }
   );
 
+  const outputSafetyCheck = await safetyLayer.filterOutput(JSON.stringify(classificationResult), {
+    traceId,
+  });
+
+  if (!outputSafetyCheck.safe) {
+    logger.error({ traceId, issues: outputSafetyCheck.issues }, 'Output failed safety check');
+  }
+
+  lifecycleManager.recordMetric('accuracy-drift', classificationResult.confidence, {
+    wasteCode: classificationResult.wasteCode,
+  });
+
   optimizer.recordUsage(selectedModel, 0.00225, 150, 1500);
 
-  logger.info(
-    { traceId, result: classificationResult },
-    'Classification completed with AIOps'
-  );
+  logger.info({ traceId, result: classificationResult }, 'Classification completed with AIOps');
 
   return {
     ...classificationResult,
@@ -200,39 +181,33 @@ export async function runWasteProfileWorkflow(labReportText, userId) {
     return classifyWasteWithAIOps(input, userId);
   });
 
-  orchestrator.registerAgent(
-    'facility-matcher',
-    async (_classificationResult) => {
-      return {
-        facilities: [
-          {
-            id: 'fac-1',
-            name: 'SafeWaste LLC',
-            acceptsCodes: ['D001'],
-            price: 2.5,
-          },
-          {
-            id: 'fac-2',
-            name: 'HazardPro Inc',
-            acceptsCodes: ['D001'],
-            price: 3.0,
-          },
-        ],
-      };
-    }
-  );
+  orchestrator.registerAgent('facility-matcher', async (_classificationResult) => {
+    return {
+      facilities: [
+        {
+          id: 'fac-1',
+          name: 'SafeWaste LLC',
+          acceptsCodes: ['D001'],
+          price: 2.5,
+        },
+        {
+          id: 'fac-2',
+          name: 'HazardPro Inc',
+          acceptsCodes: ['D001'],
+          price: 3.0,
+        },
+      ],
+    };
+  });
 
-  orchestrator.registerAgent(
-    'route-optimizer',
-    async (facilityData, _context) => {
-      const bestFacility = facilityData.facilities[0];
-      return {
-        facility: bestFacility,
-        estimatedCost: bestFacility.price * 100,
-        route: 'direct-transport',
-      };
-    }
-  );
+  orchestrator.registerAgent('route-optimizer', async (facilityData, _context) => {
+    const bestFacility = facilityData.facilities[0];
+    return {
+      facility: bestFacility,
+      estimatedCost: bestFacility.price * 100,
+      route: 'direct-transport',
+    };
+  });
 
   orchestrator.defineWorkflow('complete-waste-profile', [
     {
@@ -252,10 +227,7 @@ export async function runWasteProfileWorkflow(labReportText, userId) {
     },
   ]);
 
-  const result = await orchestrator.executeWorkflow(
-    'complete-waste-profile',
-    labReportText
-  );
+  const result = await orchestrator.executeWorkflow('complete-waste-profile', labReportText);
 
   return result;
 }

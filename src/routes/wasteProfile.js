@@ -1,8 +1,5 @@
 import express from 'express';
-import {
-  classifyWaste,
-  generateWasteProfile,
-} from '../services/wasteClassifier.js';
+import { classifyWaste, generateWasteProfile } from '../services/wasteClassifier.js';
 
 const router = express.Router();
 
@@ -15,9 +12,9 @@ router.post('/classify', async (req, res, next) => {
     }
 
     const classification = await classifyWaste(labReportText);
-    res.json(classification);
+    return res.json(classification);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -26,15 +23,13 @@ router.post('/generate', async (req, res, next) => {
     const { classificationResult } = req.body;
 
     if (!classificationResult) {
-      return res
-        .status(400)
-        .json({ error: 'Classification result is required' });
+      return res.status(400).json({ error: 'Classification result is required' });
     }
 
     const profile = await generateWasteProfile(classificationResult);
-    res.json(profile);
+    return res.json(profile);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 

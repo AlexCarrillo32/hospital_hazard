@@ -22,12 +22,7 @@ export class AISafetyLayer {
     };
 
     this.toxicityThreshold = 0.7;
-    this.blockedTopics = [
-      'illegal activity',
-      'violence',
-      'self-harm',
-      'hate speech',
-    ];
+    this.blockedTopics = ['illegal activity', 'violence', 'self-harm', 'hate speech'];
   }
 
   async filterInput(input, metadata = {}) {
@@ -166,19 +161,10 @@ export class AISafetyLayer {
   }
 
   async _assessToxicity(text) {
-    const toxicKeywords = [
-      'kill',
-      'hate',
-      'violent',
-      'attack',
-      'bomb',
-      'weapon',
-    ];
+    const toxicKeywords = ['kill', 'hate', 'violent', 'attack', 'bomb', 'weapon'];
     const lowerText = text.toLowerCase();
 
-    const keywordCount = toxicKeywords.filter((keyword) =>
-      lowerText.includes(keyword)
-    ).length;
+    const keywordCount = toxicKeywords.filter((keyword) => lowerText.includes(keyword)).length;
 
     const score = Math.min(keywordCount * 0.3, 1.0);
 

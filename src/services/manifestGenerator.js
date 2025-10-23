@@ -5,18 +5,10 @@ const logger = createLogger('manifest-generator');
 
 const manifests = new Map();
 
-export async function createManifest(
-  wasteProfile,
-  facility,
-  route,
-  options = {}
-) {
+export async function createManifest(wasteProfile, facility, route, options = {}) {
   const { traceId = `manifest-${Date.now()}`, generatorInfo = {} } = options;
 
-  logger.info(
-    { traceId, facilityId: facility.id },
-    'Creating electronic manifest'
-  );
+  logger.info({ traceId, facilityId: facility.id }, 'Creating electronic manifest');
 
   const manifestNumber = `EPA-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
   const manifestId = uuidv4();
@@ -47,10 +39,7 @@ export async function createManifest(
       address: facility.address,
     },
     transporter: {
-      name:
-        route.route.method === 'truck'
-          ? 'SafeHaul Logistics'
-          : 'FreightMaster Inc',
+      name: route.route.method === 'truck' ? 'SafeHaul Logistics' : 'FreightMaster Inc',
       epaId: route.route.method === 'truck' ? 'TXR111222333' : 'TXR444555666',
       vehicleType: route.route.method,
     },
@@ -132,12 +121,7 @@ export async function trackManifest(manifestId, options = {}) {
   return tracking;
 }
 
-export async function updateManifestStatus(
-  manifestId,
-  newStatus,
-  actor,
-  details = {}
-) {
+export async function updateManifestStatus(manifestId, newStatus, actor, details = {}) {
   const traceId = `update-${Date.now()}`;
 
   logger.info({ traceId, manifestId, newStatus }, 'Updating manifest status');
@@ -246,12 +230,14 @@ function getCurrentLocation(manifest) {
       location: 'Generator Facility',
       address: manifest.generator.address,
     };
-  } else if (status === 'shipped' || status === 'in_transit') {
+  }
+  if (status === 'shipped' || status === 'in_transit') {
     return {
       location: 'In Transit',
       address: `En route to ${manifest.facility.name}`,
     };
-  } else if (status === 'received' || status === 'completed') {
+  }
+  if (status === 'received' || status === 'completed') {
     return {
       location: 'Disposal Facility',
       address: manifest.facility.address,
@@ -287,9 +273,7 @@ function calculateEstimatedDelivery(manifest) {
 
   const shippedDate = new Date(manifest.dates.shipped);
   const durationHours = parseFloat(manifest.route.estimatedDuration);
-  const estimatedDelivery = new Date(
-    shippedDate.getTime() + durationHours * 60 * 60 * 1000
-  );
+  const estimatedDelivery = new Date(shippedDate.getTime() + durationHours * 60 * 60 * 1000);
 
   return estimatedDelivery.toISOString();
 }

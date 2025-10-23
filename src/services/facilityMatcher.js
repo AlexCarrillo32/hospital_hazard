@@ -23,15 +23,7 @@ const MOCK_FACILITIES = [
     epaId: 'TXD123456789',
     state: 'TX',
     address: '5678 Waste Management Dr, Dallas, TX 75201',
-    acceptedWasteCodes: [
-      'D001',
-      'D004',
-      'D005',
-      'D006',
-      'D007',
-      'D008',
-      'D009',
-    ],
+    acceptedWasteCodes: ['D001', 'D004', 'D005', 'D006', 'D007', 'D008', 'D009'],
     capabilities: ['metal-recovery', 'stabilization', 'landfill'],
     pricePerKg: 3.0,
     maxCapacityKg: 100000,
@@ -59,15 +51,7 @@ const MOCK_FACILITIES = [
     epaId: 'TXD888999000',
     state: 'TX',
     address: '3456 Safety Blvd, San Antonio, TX 78201',
-    acceptedWasteCodes: [
-      'D003',
-      'D004',
-      'D005',
-      'D006',
-      'D007',
-      'D008',
-      'D009',
-    ],
+    acceptedWasteCodes: ['D003', 'D004', 'D005', 'D006', 'D007', 'D008', 'D009'],
     capabilities: ['stabilization', 'encapsulation', 'secure-landfill'],
     pricePerKg: 3.5,
     maxCapacityKg: 75000,
@@ -81,21 +65,8 @@ const MOCK_FACILITIES = [
     epaId: 'CAD111222333',
     state: 'CA',
     address: '7890 Industrial Way, Los Angeles, CA 90001',
-    acceptedWasteCodes: [
-      'D001',
-      'D002',
-      'D003',
-      'F001',
-      'F002',
-      'F003',
-      'U001',
-    ],
-    capabilities: [
-      'incineration',
-      'chemical-treatment',
-      'recycling',
-      'stabilization',
-    ],
+    acceptedWasteCodes: ['D001', 'D002', 'D003', 'F001', 'F002', 'F003', 'U001'],
+    capabilities: ['incineration', 'chemical-treatment', 'recycling', 'stabilization'],
     pricePerKg: 3.2,
     maxCapacityKg: 120000,
     certificationExpiry: '2027-12-31',
@@ -164,23 +135,8 @@ const MOCK_FACILITIES = [
     epaId: 'ILD789789789',
     state: 'IL',
     address: '5678 Manufacturing Dr, Chicago, IL 60601',
-    acceptedWasteCodes: [
-      'D001',
-      'D002',
-      'D003',
-      'D004',
-      'D005',
-      'D006',
-      'D007',
-      'D008',
-      'D009',
-    ],
-    capabilities: [
-      'incineration',
-      'metal-recovery',
-      'stabilization',
-      'chemical-treatment',
-    ],
+    acceptedWasteCodes: ['D001', 'D002', 'D003', 'D004', 'D005', 'D006', 'D007', 'D008', 'D009'],
+    capabilities: ['incineration', 'metal-recovery', 'stabilization', 'chemical-treatment'],
     pricePerKg: 3.4,
     maxCapacityKg: 110000,
     certificationExpiry: '2028-12-31',
@@ -207,15 +163,7 @@ const MOCK_FACILITIES = [
     epaId: 'GAD654654654',
     state: 'GA',
     address: '4321 Peachtree Industrial, Atlanta, GA 30303',
-    acceptedWasteCodes: [
-      'D004',
-      'D005',
-      'D006',
-      'D007',
-      'D008',
-      'D009',
-      'U001',
-    ],
+    acceptedWasteCodes: ['D004', 'D005', 'D006', 'D007', 'D008', 'D009', 'U001'],
     capabilities: ['metal-recovery', 'stabilization', 'chemical-treatment'],
     pricePerKg: 2.9,
     maxCapacityKg: 85000,
@@ -238,8 +186,7 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
     'Finding approved disposal facilities'
   );
 
-  const wasteCode =
-    wasteProfile.wasteCode || wasteProfile.classification?.wasteCode;
+  const wasteCode = wasteProfile.wasteCode || wasteProfile.classification?.wasteCode;
 
   if (!wasteCode || wasteCode === 'UNKNOWN') {
     throw new Error('Cannot find facilities without valid waste code');
@@ -249,24 +196,16 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
     const acceptsWasteCode = facility.acceptedWasteCodes.includes(wasteCode);
     const isCertified = new Date(facility.certificationExpiry) > new Date();
     const hasCapacity =
-      !wasteProfile.quantityKg ||
-      facility.maxCapacityKg >= wasteProfile.quantityKg;
+      !wasteProfile.quantityKg || facility.maxCapacityKg >= wasteProfile.quantityKg;
     const matchesState = !states || states.includes(facility.state);
 
     return acceptsWasteCode && isCertified && hasCapacity && matchesState;
   });
 
   facilities = facilities.map((facility) => {
-    const distance = calculateDistance(
-      wasteProfile.generatorLocation,
-      facility.location
-    );
-    const estimatedCost =
-      facility.pricePerKg * (wasteProfile.quantityKg || 100);
-    const transportCost = calculateTransportCost(
-      distance,
-      wasteProfile.quantityKg || 100
-    );
+    const distance = calculateDistance(wasteProfile.generatorLocation, facility.location);
+    const estimatedCost = facility.pricePerKg * (wasteProfile.quantityKg || 100);
+    const transportCost = calculateTransportCost(distance, wasteProfile.quantityKg || 100);
 
     return {
       ...facility,
@@ -287,10 +226,7 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
 
   const results = facilities.slice(0, maxResults);
 
-  logger.info(
-    { traceId, wasteCode, facilitiesFound: results.length },
-    'Facility search completed'
-  );
+  logger.info({ traceId, wasteCode, facilitiesFound: results.length }, 'Facility search completed');
 
   return {
     wasteCode,
@@ -301,11 +237,7 @@ export async function findApprovedFacilities(wasteProfile, options = {}) {
   };
 }
 
-export async function calculateOptimalRoute(
-  wasteProfile,
-  facilities,
-  options = {}
-) {
+export async function calculateOptimalRoute(wasteProfile, facilities, options = {}) {
   const { traceId = `route-${Date.now()}`, prioritizeCost = true } = options;
 
   logger.info({ traceId }, 'Calculating optimal disposal route');
@@ -320,9 +252,7 @@ export async function calculateOptimalRoute(
     const ratingScore = 0.1;
 
     const normalizedCost =
-      1 -
-      facility.totalEstimatedCost /
-        Math.max(...facilities.map((f) => f.totalEstimatedCost));
+      1 - facility.totalEstimatedCost / Math.max(...facilities.map((f) => f.totalEstimatedCost));
     const normalizedDistance =
       1 - facility.distance / Math.max(...facilities.map((f) => f.distance));
     const normalizedRating = facility.rating / 5.0;

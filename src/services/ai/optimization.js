@@ -43,9 +43,7 @@ export class AIOptimizer {
     });
 
     this.routingRules.sort((a, b) => b.priority - a.priority);
-    logger.info(
-      `Added routing rule for ${modelName} with priority ${priority}`
-    );
+    logger.info(`Added routing rule for ${modelName} with priority ${priority}`);
   }
 
   selectOptimalModel(request) {
@@ -111,21 +109,20 @@ export class AIOptimizer {
 
   checkBudget(budgetName, estimatedCost, estimatedTokens) {
     const budget = this.costBudgets.get(budgetName);
-    if (!budget) return { allowed: true };
+    if (!budget) {
+      return { allowed: true };
+    }
 
     if (Date.now() > budget.resetAt) {
       this._resetBudget(budgetName);
     }
 
     const wouldExceedCost =
-      budget.maxCostPerDay &&
-      budget.currentCost + estimatedCost > budget.maxCostPerDay;
+      budget.maxCostPerDay && budget.currentCost + estimatedCost > budget.maxCostPerDay;
     const wouldExceedTokens =
-      budget.maxTokensPerDay &&
-      budget.currentTokens + estimatedTokens > budget.maxTokensPerDay;
+      budget.maxTokensPerDay && budget.currentTokens + estimatedTokens > budget.maxTokensPerDay;
     const wouldExceedRequests =
-      budget.maxRequestsPerDay &&
-      budget.currentRequests + 1 > budget.maxRequestsPerDay;
+      budget.maxRequestsPerDay && budget.currentRequests + 1 > budget.maxRequestsPerDay;
 
     if (wouldExceedCost || wouldExceedTokens || wouldExceedRequests) {
       logger.warn(
@@ -194,8 +191,7 @@ export class AIOptimizer {
         {
           batchNumber: i + 1,
           totalBatches: batches.length,
-          successCount: batchResults.filter((r) => r.status === 'fulfilled')
-            .length,
+          successCount: batchResults.filter((r) => r.status === 'fulfilled').length,
         },
         'Batch completed'
       );
@@ -209,10 +205,7 @@ export class AIOptimizer {
   }
 
   _meetsConstraints(model, request) {
-    if (
-      request.requiresCapability &&
-      !model.capabilities.includes(request.requiresCapability)
-    ) {
+    if (request.requiresCapability && !model.capabilities.includes(request.requiresCapability)) {
       return false;
     }
 
@@ -221,17 +214,13 @@ export class AIOptimizer {
     }
 
     if (request.budget) {
-      const estimatedCost =
-        (request.estimatedTokens || 1000) * model.costPerToken;
+      const estimatedCost = (request.estimatedTokens || 1000) * model.costPerToken;
       if (estimatedCost > request.budget) {
         return false;
       }
     }
 
-    if (
-      request.latencyBudgetMs &&
-      model.avgLatencyMs > request.latencyBudgetMs
-    ) {
+    if (request.latencyBudgetMs && model.avgLatencyMs > request.latencyBudgetMs) {
       return false;
     }
 
@@ -249,15 +238,11 @@ export class AIOptimizer {
   }
 
   _getMaxCostPerToken() {
-    return Math.max(
-      ...Array.from(this.models.values()).map((m) => m.costPerToken)
-    );
+    return Math.max(...Array.from(this.models.values()).map((m) => m.costPerToken));
   }
 
   _getMaxLatency() {
-    return Math.max(
-      ...Array.from(this.models.values()).map((m) => m.avgLatencyMs)
-    );
+    return Math.max(...Array.from(this.models.values()).map((m) => m.avgLatencyMs));
   }
 
   _getNextMidnight() {
@@ -280,7 +265,9 @@ export class AIOptimizer {
   }
 
   _sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
   getModelStats() {
@@ -288,10 +275,8 @@ export class AIOptimizer {
       name: model.name,
       requestCount: model.requestCount,
       totalCost: model.totalCost,
-      avgCost:
-        model.requestCount > 0 ? model.totalCost / model.requestCount : 0,
-      avgLatency:
-        model.requestCount > 0 ? model.totalLatency / model.requestCount : 0,
+      avgCost: model.requestCount > 0 ? model.totalCost / model.requestCount : 0,
+      avgLatency: model.requestCount > 0 ? model.totalLatency / model.requestCount : 0,
     }));
   }
 
@@ -300,9 +285,7 @@ export class AIOptimizer {
       name,
       currentCost: budget.currentCost,
       maxCost: budget.maxCostPerDay,
-      costUtilization: budget.maxCostPerDay
-        ? (budget.currentCost / budget.maxCostPerDay) * 100
-        : 0,
+      costUtilization: budget.maxCostPerDay ? (budget.currentCost / budget.maxCostPerDay) * 100 : 0,
       currentRequests: budget.currentRequests,
       maxRequests: budget.maxRequestsPerDay,
       resetAt: new Date(budget.resetAt).toISOString(),

@@ -10,12 +10,7 @@ export class AILifecycleManager {
   }
 
   registerDriftDetector(name, config = {}) {
-    const {
-      metricName,
-      windowSize = 1000,
-      threshold = 0.1,
-      checkIntervalMs = 60000,
-    } = config;
+    const { metricName, windowSize = 1000, threshold = 0.1, checkIntervalMs = 60000 } = config;
 
     this.driftDetectors.set(name, {
       metricName,
@@ -32,7 +27,9 @@ export class AILifecycleManager {
 
   recordMetric(detectorName, value, metadata = {}) {
     const detector = this.driftDetectors.get(detectorName);
-    if (!detector) return;
+    if (!detector) {
+      return;
+    }
 
     detector.recentSamples.push({
       value,
@@ -98,7 +95,9 @@ export class AILifecycleManager {
 
   _checkForDrift(detectorName) {
     const detector = this.driftDetectors.get(detectorName);
-    if (!detector || !detector.baseline) return;
+    if (!detector || !detector.baseline) {
+      return null;
+    }
 
     const currentMetrics = this._calculateBaseline(detector.recentSamples);
     const driftScore = this._calculateDrift(detector.baseline, currentMetrics);
@@ -146,8 +145,7 @@ export class AILifecycleManager {
 
   _calculateDrift(baseline, current) {
     const meanDrift = Math.abs(baseline.mean - current.mean) / baseline.mean;
-    const stdDevDrift =
-      Math.abs(baseline.stdDev - current.stdDev) / baseline.stdDev;
+    const stdDevDrift = Math.abs(baseline.stdDev - current.stdDev) / baseline.stdDev;
 
     return (meanDrift + stdDevDrift) / 2;
   }
@@ -156,16 +154,13 @@ export class AILifecycleManager {
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
 
-    return sorted.length % 2 === 0
-      ? (sorted[mid - 1] + sorted[mid]) / 2
-      : sorted[mid];
+    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
   }
 
   _calculateStdDev(values) {
     const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
     const squaredDiffs = values.map((v) => Math.pow(v - mean, 2));
-    const variance =
-      squaredDiffs.reduce((sum, v) => sum + v, 0) / values.length;
+    const variance = squaredDiffs.reduce((sum, v) => sum + v, 0) / values.length;
     return Math.sqrt(variance);
   }
 
@@ -173,13 +168,12 @@ export class AILifecycleManager {
     const report = [];
 
     for (const [name, detector] of this.driftDetectors.entries()) {
-      if (!detector.baseline) continue;
+      if (!detector.baseline) {
+        continue;
+      }
 
       const currentMetrics = this._calculateBaseline(detector.recentSamples);
-      const driftScore = this._calculateDrift(
-        detector.baseline,
-        currentMetrics
-      );
+      const driftScore = this._calculateDrift(detector.baseline, currentMetrics);
 
       report.push({
         detector: name,

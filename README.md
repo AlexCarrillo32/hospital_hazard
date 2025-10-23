@@ -1,29 +1,38 @@
 # Waste Compliance Agent
 
-AI-powered waste compliance and logistics platform for hazardous waste management. Automates EPA waste profiling, facility routing, and manifest tracking to reduce compliance risk and logistics costs.
+AI-powered waste compliance and logistics platform for hazardous waste
+management. Automates EPA waste profiling, facility routing, and manifest
+tracking to reduce compliance risk and logistics costs.
 
 ## Problem Statement
 
-Hazardous waste disposal is a high-stakes, manual process plagued by complex compliance requirements:
+Hazardous waste disposal is a high-stakes, manual process plagued by complex
+compliance requirements:
 
 - **100+ page waste profiles** must be created for each waste type
 - **Federal manifest tracking** (EPA RCRA) with strict requirements
 - **Six-figure fines** for a single compliance mistake
-- **Complex routing** across approved facilities with varying capabilities and pricing
+- **Complex routing** across approved facilities with varying capabilities and
+  pricing
 
 ## Solution
 
-The Waste Compliance Agent automates the entire compliance and logistics workflow:
+The Waste Compliance Agent automates the entire compliance and logistics
+workflow:
 
-1. **Monitors & Profiles**: Upload lab reports → AI classifies waste → Generates compliant EPA waste profile
-2. **Optimizes & Routes**: Finds the most cost-effective approved disposal facility and route
+1. **Monitors & Profiles**: Upload lab reports → AI classifies waste → Generates
+   compliant EPA waste profile
+2. **Optimizes & Routes**: Finds the most cost-effective approved disposal
+   facility and route
 3. **Acts**: Manages electronic manifests and creates digital audit trails
 
 ## Features (MVP)
 
 - ✅ **Waste Classification**: AI-powered analysis of lab reports
-- ✅ **EPA Waste Profile Generation**: Automated profile creation with proper RCRA codes
-- ✅ **Facility Matching**: Search approved disposal facilities by waste type and location
+- ✅ **EPA Waste Profile Generation**: Automated profile creation with proper
+  RCRA codes
+- ✅ **Facility Matching**: Search approved disposal facilities by waste type
+  and location
 - ✅ **Route Optimization**: Cost-effective and compliant routing
 - ✅ **Electronic Manifest System**: Digital tracking and signatures
 - ✅ **Audit Trail**: Immutable compliance records
@@ -160,7 +169,8 @@ docker-compose up -d
 
 ## Development Guidelines
 
-This project follows strict development best practices defined in [CLAUDE.md](./CLAUDE.md):
+This project follows strict development best practices defined in
+[CLAUDE.md](./CLAUDE.md):
 
 - **TDD**: Test-driven development for all features
 - **Simple functions**: Prefer composable, testable functions over classes

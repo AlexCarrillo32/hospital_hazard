@@ -65,13 +65,9 @@ export class AIInstrumentation {
     return {
       ...this.metrics,
       averageLatency:
-        this.metrics.totalRequests > 0
-          ? this.metrics.totalLatency / this.metrics.totalRequests
-          : 0,
+        this.metrics.totalRequests > 0 ? this.metrics.totalLatency / this.metrics.totalRequests : 0,
       errorRate:
-        this.metrics.totalRequests > 0
-          ? this.metrics.errors / this.metrics.totalRequests
-          : 0,
+        this.metrics.totalRequests > 0 ? this.metrics.errors / this.metrics.totalRequests : 0,
     };
   }
 

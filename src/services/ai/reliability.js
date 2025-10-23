@@ -32,11 +32,7 @@ export class AIReliabilityLayer {
     let result;
     let error;
 
-    for (
-      let attempt = 0;
-      attempt < (enableRetry ? this.maxRetries : 1);
-      attempt++
-    ) {
+    for (let attempt = 0; attempt < (enableRetry ? this.maxRetries : 1); attempt++) {
       try {
         const startTime = Date.now();
         result = await fn();
@@ -110,7 +106,9 @@ export class AIReliabilityLayer {
 
   _getCached(key) {
     const cached = this.cache.get(key);
-    if (!cached) return null;
+    if (!cached) {
+      return null;
+    }
 
     if (Date.now() > cached.expiresAt) {
       this.cache.delete(key);
@@ -133,7 +131,9 @@ export class AIReliabilityLayer {
   }
 
   _sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
   async _executeShadow(traceId, shadowFn, primaryResult) {
@@ -195,7 +195,9 @@ export class AIReliabilityLayer {
     const longer = str1.length > str2.length ? str1 : str2;
     const shorter = str1.length > str2.length ? str2 : str1;
 
-    if (longer.length === 0) return 1.0;
+    if (longer.length === 0) {
+      return 1.0;
+    }
 
     const commonChars = this._countCommonChars(shorter, longer);
     return commonChars / longer.length;
@@ -204,7 +206,9 @@ export class AIReliabilityLayer {
   _countCommonChars(str1, str2) {
     let count = 0;
     for (let i = 0; i < str1.length; i++) {
-      if (str2.includes(str1[i])) count++;
+      if (str2.includes(str1[i])) {
+        count++;
+      }
     }
     return count;
   }

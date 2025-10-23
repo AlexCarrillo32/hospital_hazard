@@ -43,8 +43,7 @@ export class AIEvaluator {
       totalCases: results.length,
       passed: results.filter((r) => r.passed).length,
       avgScore: results.reduce((sum, r) => sum + r.score, 0) / results.length,
-      avgLatency:
-        results.reduce((sum, r) => sum + r.latencyMs, 0) / results.length,
+      avgLatency: results.reduce((sum, r) => sum + r.latencyMs, 0) / results.length,
       timestamp: new Date().toISOString(),
     };
 
@@ -76,11 +75,15 @@ export class AIEvaluator {
 
   recordABTestResult(testName, variant, success, latencyMs) {
     const test = this.abTests.get(testName);
-    if (!test) return;
+    if (!test) {
+      return;
+    }
 
     const variantData = test[variant];
     variantData.requests += 1;
-    if (success) variantData.successes += 1;
+    if (success) {
+      variantData.successes += 1;
+    }
     variantData.totalLatency += latencyMs;
   }
 
@@ -107,10 +110,7 @@ export class AIEvaluator {
       return new RegExp(expected.pattern).test(actual) ? 1.0 : 0.0;
     }
 
-    const similarity = this._calculateSimilarity(
-      String(actual),
-      String(expected)
-    );
+    const similarity = this._calculateSimilarity(String(actual), String(expected));
     return similarity;
   }
 
@@ -118,7 +118,9 @@ export class AIEvaluator {
     const longer = str1.length > str2.length ? str1 : str2;
     const shorter = str1.length > str2.length ? str2 : str1;
 
-    if (longer.length === 0) return 1.0;
+    if (longer.length === 0) {
+      return 1.0;
+    }
 
     const editDistance = this._levenshteinDistance(longer, shorter);
     return (longer.length - editDistance) / longer.length;
@@ -129,8 +131,12 @@ export class AIEvaluator {
       .fill(null)
       .map(() => Array(str1.length + 1).fill(null));
 
-    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
-    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+    for (let i = 0; i <= str1.length; i++) {
+      matrix[0][i] = i;
+    }
+    for (let j = 0; j <= str2.length; j++) {
+      matrix[j][0] = j;
+    }
 
     for (let j = 1; j <= str2.length; j++) {
       for (let i = 1; i <= str1.length; i++) {
@@ -149,10 +155,8 @@ export class AIEvaluator {
   _calculateVariantStats(variant) {
     return {
       requests: variant.requests,
-      successRate:
-        variant.requests > 0 ? variant.successes / variant.requests : 0,
-      avgLatency:
-        variant.requests > 0 ? variant.totalLatency / variant.requests : 0,
+      successRate: variant.requests > 0 ? variant.successes / variant.requests : 0,
+      avgLatency: variant.requests > 0 ? variant.totalLatency / variant.requests : 0,
     };
   }
 
@@ -167,7 +171,9 @@ export class AIEvaluator {
     const scoreA = statsA.successRate * 0.7 + (1 / statsA.avgLatency) * 0.3;
     const scoreB = statsB.successRate * 0.7 + (1 / statsB.avgLatency) * 0.3;
 
-    if (Math.abs(scoreA - scoreB) < 0.05) return 'tie';
+    if (Math.abs(scoreA - scoreB) < 0.05) {
+      return 'tie';
+    }
     return scoreA > scoreB ? 'variantA' : 'variantB';
   }
 

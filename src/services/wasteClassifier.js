@@ -18,13 +18,7 @@ const EPA_WASTE_CODES = {
   D003: {
     category: 'reactive',
     description: 'Reactive waste',
-    characteristics: [
-      'unstable',
-      'explosive',
-      'water-reactive',
-      'cyanide',
-      'sulfide',
-    ],
+    characteristics: ['unstable', 'explosive', 'water-reactive', 'cyanide', 'sulfide'],
   },
   D004: { category: 'toxic', description: 'Arsenic toxicity' },
   D005: { category: 'toxic', description: 'Barium toxicity' },
@@ -77,16 +71,12 @@ Return classification with reasoning and confidence score.`;
     recommendedHandling: 'string',
   };
 
-  const classification = await defaultClaudeClient.generateStructuredOutput(
-    labReportText,
-    schema,
-    {
-      traceId,
-      systemPrompt,
-      temperature: 0.2,
-      maxTokens: 2048,
-    }
-  );
+  const classification = await defaultClaudeClient.generateStructuredOutput(labReportText, schema, {
+    traceId,
+    systemPrompt,
+    temperature: 0.2,
+    maxTokens: 2048,
+  });
 
   if (!EPA_WASTE_CODES[classification.wasteCode]) {
     logger.warn(
@@ -97,14 +87,10 @@ Return classification with reasoning and confidence score.`;
     classification.confidence = 0.0;
   }
 
-  lifecycleManager.recordMetric(
-    'classification-confidence',
-    classification.confidence,
-    {
-      wasteCode: classification.wasteCode,
-      userId,
-    }
-  );
+  lifecycleManager.recordMetric('classification-confidence', classification.confidence, {
+    wasteCode: classification.wasteCode,
+    userId,
+  });
 
   logger.info(
     {
@@ -124,8 +110,7 @@ Return classification with reasoning and confidence score.`;
 }
 
 export async function generateWasteProfile(classificationResult, options = {}) {
-  const { traceId = classificationResult.traceId || `profile-${Date.now()}` } =
-    options;
+  const { traceId = classificationResult.traceId || `profile-${Date.now()}` } = options;
 
   logger.info({ traceId }, 'Generating EPA waste profile');
 
@@ -169,10 +154,7 @@ Generate a comprehensive waste profile document (100+ words minimum) that would 
     traceId,
   };
 
-  logger.info(
-    { traceId, wasteCode: profile.wasteCode },
-    'Waste profile generated'
-  );
+  logger.info({ traceId, wasteCode: profile.wasteCode }, 'Waste profile generated');
 
   return profile;
 }

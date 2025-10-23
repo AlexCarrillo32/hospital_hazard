@@ -1,6 +1,7 @@
 # AI Operations (AIOps) Guide
 
-This guide explains how to use the comprehensive AIOps framework included in the Waste Compliance Agent.
+This guide explains how to use the comprehensive AIOps framework included in the
+Waste Compliance Agent.
 
 ## Overview
 
@@ -78,7 +79,8 @@ console.log(metrics);
 
 ### Purpose
 
-Validate AI performance before and after changes using offline test sets and A/B tests.
+Validate AI performance before and after changes using offline test sets and A/B
+tests.
 
 ### Offline Evaluation
 
@@ -484,7 +486,8 @@ const results = await orchestrator.executeParallel(
 
 ## Complete Example
 
-See [aiops-example.js](../src/services/ai/aiops-example.js) for a complete working example that integrates all components.
+See [aiops-example.js](../src/services/ai/aiops-example.js) for a complete
+working example that integrates all components.
 
 ## Monitoring Dashboard
 

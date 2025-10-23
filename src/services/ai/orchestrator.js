@@ -70,19 +70,12 @@ export class AIOrchestrator {
     try {
       for (let i = 0; i < workflow.steps.length; i++) {
         const step = workflow.steps[i];
-        const stepResult = await this._executeStep(
-          executionId,
-          step,
-          context,
-          i
-        );
+        const stepResult = await this._executeStep(executionId, step, context, i);
 
         execution.steps.push(stepResult);
 
         if (!stepResult.success) {
-          throw new Error(
-            `Step ${step.name} failed: ${stepResult.error.message}`
-          );
+          throw new Error(`Step ${step.name} failed: ${stepResult.error.message}`);
         }
 
         context = this._mergeContext(context, stepResult.output);
@@ -156,8 +149,7 @@ export class AIOrchestrator {
       try {
         const startTime = Date.now();
 
-        const stepInput =
-          typeof input === 'function' ? input(context) : context.input;
+        const stepInput = typeof input === 'function' ? input(context) : context.input;
 
         const output = await agentInstance.handler(stepInput, context);
 
@@ -231,10 +223,7 @@ export class AIOrchestrator {
         return Promise.reject(new Error(`Agent not found: ${agentName}`));
       }
 
-      return Promise.race([
-        agent.handler(inputs[index] || inputs[0]),
-        this._timeout(timeout),
-      ]);
+      return Promise.race([agent.handler(inputs[index] || inputs[0]), this._timeout(timeout)]);
     });
 
     const results = await Promise.allSettled(promises);
@@ -259,13 +248,15 @@ export class AIOrchestrator {
   }
 
   _sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
   _timeout(ms) {
-    return new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Execution timeout')), ms)
-    );
+    return new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Execution timeout')), ms);
+    });
   }
 
   getExecutionStatus(executionId) {
@@ -300,10 +291,7 @@ export class AIOrchestrator {
     return {
       name: agentName,
       executionCount: agent.executionCount,
-      avgLatency:
-        agent.executionCount > 0
-          ? agent.totalLatency / agent.executionCount
-          : 0,
+      avgLatency: agent.executionCount > 0 ? agent.totalLatency / agent.executionCount : 0,
     };
   }
 }
