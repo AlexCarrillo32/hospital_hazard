@@ -1,48 +1,9 @@
 import { createLogger } from '../utils/logger.js';
 import { defaultClaudeClient } from './ai/claudeClient.js';
 import { lifecycleManager } from './ai/lifecycle.js';
+import { EPA_WASTE_CODES, getAllWasteCodes, getWasteCode } from '../data/epaWasteCodes.js';
 
 const logger = createLogger('waste-classifier');
-
-const EPA_WASTE_CODES = {
-  D001: {
-    category: 'ignitable',
-    description: 'Ignitable waste (flash point < 140°F)',
-    characteristics: ['flammable', 'combustible', 'oxidizer'],
-  },
-  D002: {
-    category: 'corrosive',
-    description: 'Corrosive waste (pH ≤ 2 or ≥ 12.5)',
-    characteristics: ['acidic', 'alkaline', 'caustic'],
-  },
-  D003: {
-    category: 'reactive',
-    description: 'Reactive waste',
-    characteristics: ['unstable', 'explosive', 'water-reactive', 'cyanide', 'sulfide'],
-  },
-  D004: { category: 'toxic', description: 'Arsenic toxicity' },
-  D005: { category: 'toxic', description: 'Barium toxicity' },
-  D006: { category: 'toxic', description: 'Cadmium toxicity' },
-  D007: { category: 'toxic', description: 'Chromium toxicity' },
-  D008: { category: 'toxic', description: 'Lead toxicity' },
-  D009: { category: 'toxic', description: 'Mercury toxicity' },
-  F001: {
-    category: 'solvent',
-    description: 'Spent halogenated solvents',
-  },
-  F002: {
-    category: 'solvent',
-    description: 'Spent halogenated solvents',
-  },
-  F003: {
-    category: 'solvent',
-    description: 'Spent non-halogenated solvents',
-  },
-  U001: {
-    category: 'commercial-chemical',
-    description: 'Acetaldehyde',
-  },
-};
 
 export async function classifyWaste(labReportText, options = {}) {
   const { traceId = `waste-${Date.now()}`, userId = 'system' } = options;
@@ -160,9 +121,7 @@ Generate a comprehensive waste profile document (100+ words minimum) that would 
 }
 
 export function getWasteCodeInfo(wasteCode) {
-  return EPA_WASTE_CODES[wasteCode] || null;
+  return getWasteCode(wasteCode);
 }
 
-export function getAllWasteCodes() {
-  return EPA_WASTE_CODES;
-}
+export { getAllWasteCodes };
