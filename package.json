@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md}\""
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "db:init": "node scripts/init-db.js",
+    "db:test": "node -e \"import('./src/db/connection.js').then(db => db.testConnection().then(() => process.exit(0))).catch(() => process.exit(1))\""
   },
   "keywords": [
     "hazardous-waste",
