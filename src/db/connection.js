@@ -1,8 +1,10 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
-import logger from '../utils/logger.js';
+import { createLogger } from '../utils/logger.js';
 
 dotenv.config();
+
+const logger = createLogger('database');
 
 const { Pool } = pg;
 

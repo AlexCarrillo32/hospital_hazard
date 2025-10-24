@@ -1,0 +1,47 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+
+# Tests
+coverage/
+*.test.js
+tests/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Version Control
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# CI/CD
+.github/
+
+# Misc
+.prettierrc.json
+.prettierignore
+eslint.config.js
+jest.config.js
+docker-compose.yml
+Dockerfile
+.dockerignore

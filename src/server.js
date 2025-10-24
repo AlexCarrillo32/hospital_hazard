@@ -5,6 +5,7 @@ import { createLogger } from './utils/logger.js';
 import { apiLimiter, strictLimiter } from './middleware/rateLimiter.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { securityHeaders, jsonSanitizer } from './middleware/security.js';
+import healthRoutes from './routes/health.js';
 import wasteProfileRoutes from './routes/wasteProfile.js';
 import facilityRoutes from './routes/facility.js';
 import manifestRoutes from './routes/manifest.js';
@@ -31,10 +32,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // JSON sanitization
 app.use(jsonSanitizer);
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
-});
-
+// Routes
+app.use('/health', healthRoutes);
 app.use('/api/waste-profiles', wasteProfileRoutes);
 app.use('/api/facilities', facilityRoutes);
 app.use('/api/manifests', manifestRoutes);

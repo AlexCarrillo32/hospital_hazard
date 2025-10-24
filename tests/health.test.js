@@ -9,6 +9,7 @@ describe('Health Check', () => {
     expect(response.body).toEqual({
       status: 'healthy',
       timestamp: expect.any(String),
+      uptime: expect.any(Number),
     });
   });
 });

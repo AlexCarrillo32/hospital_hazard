@@ -10,6 +10,7 @@ describe('API Integration Tests', () => {
       expect(response.body).toEqual({
         status: 'healthy',
         timestamp: expect.any(String),
+        uptime: expect.any(Number),
       });
     });
   });
