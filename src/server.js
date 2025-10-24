@@ -1,21 +1,35 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import config from './config/env.js';
 import { createLogger } from './utils/logger.js';
+import { apiLimiter, strictLimiter } from './middleware/rateLimiter.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { securityHeaders, jsonSanitizer } from './middleware/security.js';
 import wasteProfileRoutes from './routes/wasteProfile.js';
 import facilityRoutes from './routes/facility.js';
 import manifestRoutes from './routes/manifest.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-dotenv.config();
-
 const app = express();
 const logger = createLogger('server');
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT;
 
+// Security middleware
+app.use(securityHeaders);
 app.use(cors());
+
+// Request logging
+app.use(requestLogger);
+
+// Rate limiting
+app.use('/api/', apiLimiter);
+
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// JSON sanitization
+app.use(jsonSanitizer);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });

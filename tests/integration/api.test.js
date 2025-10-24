@@ -168,6 +168,8 @@ describe('API Integration Tests', () => {
         pricePerKg: 2.5,
         distance: 150,
         totalEstimatedCost: 500,
+        estimatedDisposalCost: 375,
+        estimatedTransportCost: 125,
         rating: 4.5,
         location: { lat: 30.0, lng: -96.0 },
       },

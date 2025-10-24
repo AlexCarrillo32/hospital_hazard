@@ -7,4 +7,5 @@ export default {
   transform: {},
   moduleFileExtensions: ['js', 'json'],
   verbose: true,
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
 };

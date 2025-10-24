@@ -203,7 +203,7 @@ describe('manifestGenerator', () => {
           manifestId: testManifestId,
           manifestNumber: expect.any(String),
           status: expect.any(String),
-          currentLocation: expect.any(String),
+          currentLocation: expect.any(Object),
           timeline: expect.any(Array),
           signatures: expect.any(Object),
           traceId: expect.any(String),
