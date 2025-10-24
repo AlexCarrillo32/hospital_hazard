@@ -2,6 +2,12 @@ import { createLogger } from '../../utils/logger.js';
 import { instrumentation } from './instrumentation.js';
 import { safetyLayer } from './safety.js';
 import { reliabilityLayer } from './reliability.js';
+import {
+  parseAPIError,
+  SafetyViolationError,
+  TimeoutError,
+  InvalidRequestError,
+} from './errors.js';
 
 const logger = createLogger('claude-client');
 
@@ -32,9 +38,7 @@ export class ClaudeClient {
     if (enableSafety) {
       const inputCheck = await safetyLayer.filterInput(prompt, { traceId });
       if (!inputCheck.safe) {
-        const error = new Error('Input rejected by safety layer');
-        error.safetyIssues = inputCheck.issues;
-        throw error;
+        throw new SafetyViolationError('Input rejected by safety layer', inputCheck.issues);
       }
       prompt = inputCheck.scrubbedInput;
     }
@@ -82,20 +86,37 @@ export class ClaudeClient {
         requestBody.system = systemPrompt;
       }
 
-      const response = await fetch(`${this.endpoint}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify(requestBody),
-        signal: AbortSignal.timeout(this.timeout),
-      });
+      let response;
+      try {
+        response = await fetch(`${this.endpoint}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(this.timeout),
+        });
+      } catch (error) {
+        if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+          throw new TimeoutError(`Request timed out after ${this.timeout}ms`, this.timeout);
+        }
+        throw error;
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+        const apiError = parseAPIError(response, errorText);
+        logger.error(
+          {
+            traceId,
+            status: response.status,
+            error: errorText,
+          },
+          'Claude API request failed'
+        );
+        throw apiError;
       }
 
       const data = await response.json();
@@ -156,12 +177,20 @@ export class ClaudeClient {
     try {
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('No JSON found in response');
+        throw new InvalidRequestError('No JSON found in model response', {
+          response: response.substring(0, 200),
+        });
       }
       return JSON.parse(jsonMatch[0]);
     } catch (error) {
       logger.error({ error: error.message, response }, 'Failed to parse structured output');
-      throw new Error('Invalid JSON response from model');
+      if (error instanceof InvalidRequestError) {
+        throw error;
+      }
+      throw new InvalidRequestError('Invalid JSON response from model', {
+        parseError: error.message,
+        response: response.substring(0, 200),
+      });
     }
   }
 
