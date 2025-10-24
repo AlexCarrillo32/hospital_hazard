@@ -7,6 +7,178 @@ dotenv.config();
 
 const { Client } = pg;
 
+async function seedWasteCodes(client) {
+  console.log('📦 Seeding EPA waste codes...');
+  const wasteCodes = Object.values(EPA_WASTE_CODES);
+  let count = 0;
+
+  for (const wasteCode of wasteCodes) {
+    await client.query(
+      `INSERT INTO waste_codes (
+        code, category, type, description, haz_class,
+        examples, disposal_method, handling_precautions, cas_number
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ON CONFLICT (code) DO UPDATE SET
+        category = EXCLUDED.category,
+        type = EXCLUDED.type,
+        description = EXCLUDED.description,
+        haz_class = EXCLUDED.haz_class,
+        examples = EXCLUDED.examples,
+        disposal_method = EXCLUDED.disposal_method,
+        handling_precautions = EXCLUDED.handling_precautions,
+        cas_number = EXCLUDED.cas_number`,
+      [
+        wasteCode.code,
+        wasteCode.category,
+        wasteCode.type,
+        wasteCode.description,
+        wasteCode.hazardClass,
+        JSON.stringify(wasteCode.examples),
+        wasteCode.disposal,
+        wasteCode.handlingPrecautions,
+        wasteCode.casNumber || null,
+      ]
+    );
+    count++;
+  }
+  console.log(`   ✅ Inserted/updated ${count} waste codes`);
+  return count;
+}
+
+async function seedFacilities(client) {
+  console.log('\n🏭 Seeding disposal facilities...');
+  let count = 0;
+
+  for (const facility of MOCK_FACILITIES) {
+    await client.query(
+      `INSERT INTO facilities (
+        id, name, epa_id, address, city, state, zip_code,
+        latitude, longitude, accepted_waste_codes, price_per_kg,
+        max_capacity_kg, current_capacity_kg, certifications, rating, phone, email
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      ON CONFLICT (id) DO UPDATE SET
+        name = EXCLUDED.name,
+        epa_id = EXCLUDED.epa_id,
+        address = EXCLUDED.address,
+        city = EXCLUDED.city,
+        state = EXCLUDED.state,
+        zip_code = EXCLUDED.zip_code,
+        latitude = EXCLUDED.latitude,
+        longitude = EXCLUDED.longitude,
+        accepted_waste_codes = EXCLUDED.accepted_waste_codes,
+        price_per_kg = EXCLUDED.price_per_kg,
+        max_capacity_kg = EXCLUDED.max_capacity_kg,
+        certifications = EXCLUDED.certifications,
+        rating = EXCLUDED.rating`,
+      [
+        facility.id,
+        facility.name,
+        facility.epaId,
+        facility.address,
+        facility.city || extractCity(facility.address),
+        facility.state,
+        facility.zipCode || extractZip(facility.address),
+        facility.location.lat,
+        facility.location.lng,
+        JSON.stringify(facility.acceptedWasteCodes),
+        facility.pricePerKg,
+        facility.maxCapacityKg,
+        facility.currentCapacityKg || 0,
+        JSON.stringify(facility.certifications),
+        facility.rating,
+        facility.phone || '(555) 000-0000',
+        facility.email || `contact@${facility.id}.example.com`,
+      ]
+    );
+    count++;
+  }
+  console.log(`   ✅ Inserted/updated ${count} facilities`);
+  return count;
+}
+
+async function seedGenerators(client) {
+  console.log('\n🏥 Seeding sample generators...');
+  const sampleGenerators = [
+    {
+      id: 'gen-001',
+      name: 'Memorial Hospital',
+      epaId: 'TXD111222333',
+      address: '123 Medical Center Blvd',
+      city: 'Houston',
+      state: 'TX',
+      zipCode: '77030',
+      contactName: 'Dr. Sarah Johnson',
+      contactEmail: 'sarah.johnson@memorial.example.com',
+      contactPhone: '(713) 555-1234',
+    },
+    {
+      id: 'gen-002',
+      name: 'Tech Manufacturing Inc',
+      epaId: 'CAD987654321',
+      address: '456 Silicon Valley Way',
+      city: 'San Jose',
+      state: 'CA',
+      zipCode: '95110',
+      contactName: 'John Smith',
+      contactEmail: 'john.smith@techmanuf.example.com',
+      contactPhone: '(408) 555-5678',
+    },
+    {
+      id: 'gen-003',
+      name: 'Chemical Solutions LLC',
+      epaId: 'NYD456789012',
+      address: '789 Industrial Pkwy',
+      city: 'Buffalo',
+      state: 'NY',
+      zipCode: '14201',
+      contactName: 'Maria Garcia',
+      contactEmail: 'maria.garcia@chemsol.example.com',
+      contactPhone: '(716) 555-9012',
+    },
+  ];
+
+  let count = 0;
+  for (const generator of sampleGenerators) {
+    await client.query(
+      `INSERT INTO generators (
+        id, name, epa_id, address, city, state, zip_code,
+        contact_name, contact_email, contact_phone
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      ON CONFLICT (id) DO UPDATE SET
+        name = EXCLUDED.name,
+        epa_id = EXCLUDED.epa_id,
+        contact_name = EXCLUDED.contact_name,
+        contact_email = EXCLUDED.contact_email`,
+      [
+        generator.id,
+        generator.name,
+        generator.epaId,
+        generator.address,
+        generator.city,
+        generator.state,
+        generator.zipCode,
+        generator.contactName,
+        generator.contactEmail,
+        generator.contactPhone,
+      ]
+    );
+    count++;
+  }
+  console.log(`   ✅ Inserted/updated ${count} generators`);
+  return count;
+}
+
+async function printDatabaseStatistics(client) {
+  console.log('\n📊 Database Statistics:');
+  const wasteCodesResult = await client.query('SELECT COUNT(*) FROM waste_codes');
+  const facilitiesResult = await client.query('SELECT COUNT(*) FROM facilities');
+  const generatorsResult = await client.query('SELECT COUNT(*) FROM generators');
+
+  console.log(`   - Waste Codes: ${wasteCodesResult.rows[0].count}`);
+  console.log(`   - Facilities: ${facilitiesResult.rows[0].count}`);
+  console.log(`   - Generators: ${generatorsResult.rows[0].count}`);
+}
+
 async function seedDatabase() {
   const client = new Client({
     host: process.env.DB_HOST || 'localhost',
@@ -20,176 +192,10 @@ async function seedDatabase() {
     await client.connect();
     console.log('✅ Connected to database\n');
 
-    // Seed waste codes
-    console.log('📦 Seeding EPA waste codes...');
-    const wasteCodes = Object.values(EPA_WASTE_CODES);
-    let wasteCodeCount = 0;
-
-    for (const wasteCode of wasteCodes) {
-      await client.query(
-        `
-        INSERT INTO waste_codes (
-          code, category, type, description, haz_class,
-          examples, disposal_method, handling_precautions, cas_number
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        ON CONFLICT (code) DO UPDATE SET
-          category = EXCLUDED.category,
-          type = EXCLUDED.type,
-          description = EXCLUDED.description,
-          haz_class = EXCLUDED.haz_class,
-          examples = EXCLUDED.examples,
-          disposal_method = EXCLUDED.disposal_method,
-          handling_precautions = EXCLUDED.handling_precautions,
-          cas_number = EXCLUDED.cas_number
-        `,
-        [
-          wasteCode.code,
-          wasteCode.category,
-          wasteCode.type,
-          wasteCode.description,
-          wasteCode.hazardClass,
-          JSON.stringify(wasteCode.examples),
-          wasteCode.disposal,
-          wasteCode.handlingPrecautions,
-          wasteCode.casNumber || null,
-        ]
-      );
-      wasteCodeCount++;
-    }
-    console.log(`   ✅ Inserted/updated ${wasteCodeCount} waste codes`);
-
-    // Seed facilities
-    console.log('\n🏭 Seeding disposal facilities...');
-    let facilityCount = 0;
-
-    for (const facility of MOCK_FACILITIES) {
-      await client.query(
-        `
-        INSERT INTO facilities (
-          id, name, epa_id, address, city, state, zip_code,
-          latitude, longitude, accepted_waste_codes, price_per_kg,
-          max_capacity_kg, current_capacity_kg, certifications, rating, phone, email
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          epa_id = EXCLUDED.epa_id,
-          address = EXCLUDED.address,
-          city = EXCLUDED.city,
-          state = EXCLUDED.state,
-          zip_code = EXCLUDED.zip_code,
-          latitude = EXCLUDED.latitude,
-          longitude = EXCLUDED.longitude,
-          accepted_waste_codes = EXCLUDED.accepted_waste_codes,
-          price_per_kg = EXCLUDED.price_per_kg,
-          max_capacity_kg = EXCLUDED.max_capacity_kg,
-          certifications = EXCLUDED.certifications,
-          rating = EXCLUDED.rating
-        `,
-        [
-          facility.id,
-          facility.name,
-          facility.epaId,
-          facility.address,
-          facility.city || extractCity(facility.address),
-          facility.state,
-          facility.zipCode || extractZip(facility.address),
-          facility.location.lat,
-          facility.location.lng,
-          JSON.stringify(facility.acceptedWasteCodes),
-          facility.pricePerKg,
-          facility.maxCapacityKg,
-          facility.currentCapacityKg || 0,
-          JSON.stringify(facility.certifications),
-          facility.rating,
-          facility.phone || '(555) 000-0000',
-          facility.email || `contact@${facility.id}.example.com`,
-        ]
-      );
-      facilityCount++;
-    }
-    console.log(`   ✅ Inserted/updated ${facilityCount} facilities`);
-
-    // Seed sample generators
-    console.log('\n🏥 Seeding sample generators...');
-    const sampleGenerators = [
-      {
-        id: 'gen-001',
-        name: 'Memorial Hospital',
-        epaId: 'TXD111222333',
-        address: '123 Medical Center Blvd',
-        city: 'Houston',
-        state: 'TX',
-        zipCode: '77030',
-        contactName: 'Dr. Sarah Johnson',
-        contactEmail: 'sarah.johnson@memorial.example.com',
-        contactPhone: '(713) 555-1234',
-      },
-      {
-        id: 'gen-002',
-        name: 'Tech Manufacturing Inc',
-        epaId: 'CAD987654321',
-        address: '456 Silicon Valley Way',
-        city: 'San Jose',
-        state: 'CA',
-        zipCode: '95110',
-        contactName: 'John Smith',
-        contactEmail: 'john.smith@techmanuf.example.com',
-        contactPhone: '(408) 555-5678',
-      },
-      {
-        id: 'gen-003',
-        name: 'Chemical Solutions LLC',
-        epaId: 'NYD456789012',
-        address: '789 Industrial Pkwy',
-        city: 'Buffalo',
-        state: 'NY',
-        zipCode: '14201',
-        contactName: 'Maria Garcia',
-        contactEmail: 'maria.garcia@chemsol.example.com',
-        contactPhone: '(716) 555-9012',
-      },
-    ];
-
-    let generatorCount = 0;
-    for (const generator of sampleGenerators) {
-      await client.query(
-        `
-        INSERT INTO generators (
-          id, name, epa_id, address, city, state, zip_code,
-          contact_name, contact_email, contact_phone
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          epa_id = EXCLUDED.epa_id,
-          contact_name = EXCLUDED.contact_name,
-          contact_email = EXCLUDED.contact_email
-        `,
-        [
-          generator.id,
-          generator.name,
-          generator.epaId,
-          generator.address,
-          generator.city,
-          generator.state,
-          generator.zipCode,
-          generator.contactName,
-          generator.contactEmail,
-          generator.contactPhone,
-        ]
-      );
-      generatorCount++;
-    }
-    console.log(`   ✅ Inserted/updated ${generatorCount} generators`);
-
-    // Verify seeding
-    console.log('\n📊 Database Statistics:');
-    const wasteCodesResult = await client.query('SELECT COUNT(*) FROM waste_codes');
-    const facilitiesResult = await client.query('SELECT COUNT(*) FROM facilities');
-    const generatorsResult = await client.query('SELECT COUNT(*) FROM generators');
-
-    console.log(`   - Waste Codes: ${wasteCodesResult.rows[0].count}`);
-    console.log(`   - Facilities: ${facilitiesResult.rows[0].count}`);
-    console.log(`   - Generators: ${generatorsResult.rows[0].count}`);
+    await seedWasteCodes(client);
+    await seedFacilities(client);
+    await seedGenerators(client);
+    await printDatabaseStatistics(client);
 
     await client.end();
     console.log('\n✅ Database seeding completed successfully!');

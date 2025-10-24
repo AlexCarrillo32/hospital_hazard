@@ -21,51 +21,15 @@ export class AIReliabilityLayer {
       shadowFn = null,
     } = options;
 
+    const cachedResult = this._tryGetCachedResult(traceId, cacheKey, enableCache);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+    const result = await this._executeWithRetry(fn, traceId, enableRetry);
+
     if (enableCache && cacheKey) {
-      const cached = this._getCached(cacheKey);
-      if (cached) {
-        logger.info({ traceId, cacheKey }, 'Cache hit');
-        return { result: cached, fromCache: true };
-      }
-    }
-
-    let result;
-    let error;
-
-    for (let attempt = 0; attempt < (enableRetry ? this.maxRetries : 1); attempt++) {
-      try {
-        const startTime = Date.now();
-        result = await fn();
-        const latencyMs = Date.now() - startTime;
-
-        logger.info({ traceId, attempt, latencyMs }, 'Request succeeded');
-
-        if (enableCache && cacheKey) {
-          this._setCache(cacheKey, result, cacheTtlMs);
-        }
-
-        break;
-      } catch (err) {
-        error = err;
-        logger.warn(
-          {
-            traceId,
-            attempt,
-            error: err.message,
-          },
-          'Request failed, retrying...'
-        );
-
-        if (attempt < this.maxRetries - 1) {
-          const delayMs = this._calculateBackoff(attempt);
-          await this._sleep(delayMs);
-        }
-      }
-    }
-
-    if (error && !result) {
-      logger.error({ traceId, error: error.message }, 'All retries exhausted');
-      throw error;
+      this._setCache(cacheKey, result, cacheTtlMs);
     }
 
     if (enableShadowDeploy && shadowFn) {
@@ -73,6 +37,54 @@ export class AIReliabilityLayer {
     }
 
     return { result, fromCache: false };
+  }
+
+  _tryGetCachedResult(traceId, cacheKey, enableCache) {
+    if (!enableCache || !cacheKey) {
+      return null;
+    }
+
+    const cached = this._getCached(cacheKey);
+    if (cached) {
+      logger.info({ traceId, cacheKey }, 'Cache hit');
+      return { result: cached, fromCache: true };
+    }
+
+    return null;
+  }
+
+  async _executeWithRetry(fn, traceId, enableRetry) {
+    const maxAttempts = enableRetry ? this.maxRetries : 1;
+    let result;
+    let lastError;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        result = await this._executeRequest(fn, traceId, attempt);
+        return result;
+      } catch (err) {
+        lastError = err;
+        logger.warn({ traceId, attempt, error: err.message }, 'Request failed, retrying...');
+
+        if (attempt < maxAttempts - 1) {
+          const delayMs = this._calculateBackoff(attempt);
+          await this._sleep(delayMs);
+        }
+      }
+    }
+
+    logger.error({ traceId, error: lastError.message }, 'All retries exhausted');
+    throw lastError;
+  }
+
+  async _executeRequest(fn, traceId, attempt) {
+    const startTime = Date.now();
+    const result = await fn();
+    const latencyMs = Date.now() - startTime;
+
+    logger.info({ traceId, attempt, latencyMs }, 'Request succeeded');
+
+    return result;
   }
 
   async batchExecute(requests, options = {}) {

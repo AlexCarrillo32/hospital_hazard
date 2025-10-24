@@ -205,6 +205,8 @@ describe('manifestGenerator', () => {
           status: expect.any(String),
           currentLocation: expect.any(String),
           timeline: expect.any(Array),
+          signatures: expect.any(Object),
+          traceId: expect.any(String),
         })
       );
     });
@@ -260,10 +262,12 @@ describe('manifestGenerator', () => {
       const result = await updateManifestStatus(testManifestId, 'in_transit');
 
       const statusEvent = result.auditTrail.find(
-        (event) => event.action === 'status_updated' && event.details.newStatus === 'in_transit'
+        (event) => event.action === 'status_changed_created_to_in_transit'
       );
 
       expect(statusEvent).toBeDefined();
+      expect(statusEvent.details.previousStatus).toBe('created');
+      expect(statusEvent.details.newStatus).toBe('in_transit');
     });
   });
 });

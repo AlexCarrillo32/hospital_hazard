@@ -9,7 +9,6 @@ describe('API Integration Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         status: 'healthy',
-        service: 'waste-compliance-agent',
         timestamp: expect.any(String),
       });
     });
