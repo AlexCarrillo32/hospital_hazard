@@ -1,7 +1,10 @@
 import express from 'express';
+import https from 'https';
+import http from 'http';
 import cors from 'cors';
 import config from './config/env.js';
 import { createLogger } from './utils/logger.js';
+import { getSSLConfig } from './config/ssl.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { securityHeaders, jsonSanitizer } from './middleware/security.js';
@@ -70,10 +73,47 @@ app.use('/api/manifests', manifestRoutes);
 
 app.use(errorHandler);
 
+// Start server (HTTP or HTTPS based on configuration)
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    logger.info(`Waste Compliance Agent running on port ${PORT}`);
-  });
+  try {
+    const sslConfig = getSSLConfig();
+
+    if (sslConfig) {
+      // HTTPS server
+      const httpsServer = https.createServer(sslConfig, app);
+      httpsServer.listen(PORT, () => {
+        logger.info(`🔒 Waste Compliance Agent running on HTTPS port ${PORT}`);
+        logger.info('SSL/TLS enabled with secure configuration');
+      });
+
+      // Optional: Redirect HTTP to HTTPS
+      if (process.env.HTTP_REDIRECT === 'true') {
+        const HTTP_PORT = process.env.HTTP_PORT || 80;
+        const httpApp = express();
+
+        httpApp.use('*', (req, res) => {
+          const host = req.headers.host?.replace(/:\d+$/, '');
+          const redirectUrl = `https://${host}:${PORT}${req.url}`;
+          logger.debug({ from: req.url, to: redirectUrl }, 'HTTP to HTTPS redirect');
+          res.redirect(301, redirectUrl);
+        });
+
+        httpApp.listen(HTTP_PORT, () => {
+          logger.info(`HTTP redirect server running on port ${HTTP_PORT} → HTTPS ${PORT}`);
+        });
+      }
+    } else {
+      // HTTP server (development only)
+      const httpServer = http.createServer(app);
+      httpServer.listen(PORT, () => {
+        logger.info(`Waste Compliance Agent running on HTTP port ${PORT}`);
+        logger.warn('⚠️  SSL/TLS is disabled - NOT SUITABLE FOR PRODUCTION');
+      });
+    }
+  } catch (error) {
+    logger.error({ error: error.message }, 'Failed to start server');
+    process.exit(1);
+  }
 }
 
 export default app;

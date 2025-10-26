@@ -88,6 +88,38 @@ const envSchema = {
     default: null,
     sensitive: true,
   },
+
+  // SSL/TLS Configuration
+  SSL_ENABLED: {
+    type: 'boolean',
+    required: false,
+    default: false,
+  },
+  SSL_CERT_PATH: {
+    type: 'string',
+    required: false,
+    default: null,
+  },
+  SSL_KEY_PATH: {
+    type: 'string',
+    required: false,
+    default: null,
+  },
+  SSL_CA_PATH: {
+    type: 'string',
+    required: false,
+    default: null,
+  },
+  HTTP_REDIRECT: {
+    type: 'boolean',
+    required: false,
+    default: false,
+  },
+  HTTP_PORT: {
+    type: 'number',
+    required: false,
+    default: 80,
+  },
 };
 
 function parseValue(value, type) {
