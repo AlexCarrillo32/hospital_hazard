@@ -14,7 +14,9 @@ import wasteProfileRoutes from './routes/wasteProfile.js';
 import facilityRoutes from './routes/facility.js';
 import manifestRoutes from './routes/manifest.js';
 import securityRoutes from './routes/security.js';
+import auditRoutes from './routes/audit.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { auditLogger } from './middleware/auditLogger.js';
 
 const app = express();
 const logger = createLogger('server');
@@ -64,12 +66,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(jsonSanitizer);
 app.use(sanitizeInputs);
 
+// Audit logging middleware (logs all API requests)
+app.use('/api', auditLogger({ eventType: 'api_request', includeBody: false }));
+
 // Routes
 app.use('/health', healthRoutes);
 app.use('/api', securityRoutes); // CSP reporting and other security endpoints
 app.use('/api/waste-profiles', wasteProfileRoutes);
 app.use('/api/facilities', facilityRoutes);
 app.use('/api/manifests', manifestRoutes);
+app.use('/api/audit', auditRoutes);
 
 app.use(errorHandler);
 

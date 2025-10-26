@@ -2,6 +2,7 @@ import express from 'express';
 import { body } from 'express-validator';
 import { classifyWaste, generateWasteProfile } from '../services/wasteClassifier.js';
 import { handleValidationErrors } from '../middleware/validation.js';
+import { auditClassification, auditProfileGeneration } from '../middleware/auditLogger.js';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.post(
       .withMessage('Lab report text must be between 10 and 50000 characters'),
     handleValidationErrors,
   ],
+  auditClassification(),
   async (req, res, next) => {
     try {
       const { labReportText } = req.body;
@@ -37,6 +39,7 @@ router.post(
       .withMessage('Classification result must be an object'),
     handleValidationErrors,
   ],
+  auditProfileGeneration(),
   async (req, res, next) => {
     try {
       const { classificationResult } = req.body;
