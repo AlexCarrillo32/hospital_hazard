@@ -28,7 +28,7 @@ router.get('/ready', async (_req, res) => {
       const pool = getPool();
       await pool.query('SELECT 1');
       checks.database = 'healthy';
-    } catch (dbError) {
+    } catch {
       checks.database = 'unhealthy';
     }
 
@@ -79,7 +79,7 @@ router.get('/ai', (_req, res) => {
   const aiStatus = {
     mode: config.AI_MOCK_MODE ? 'mock' : 'production',
     endpoint: config.MODEL_ENDPOINT || 'not-configured',
-    configured: !config.AI_MOCK_MODE && !!config.ANTHROPIC_API_KEY,
+    configured: !config.AI_MOCK_MODE && Boolean(config.ANTHROPIC_API_KEY),
   };
 
   return res.json({

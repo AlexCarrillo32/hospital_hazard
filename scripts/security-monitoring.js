@@ -59,7 +59,7 @@ function parseLogLine(line) {
  * Check for security events in log
  */
 function checkSecurityEvent(log) {
-  if (!log) return null;
+  if (!log) {return null;}
 
   // Failed authentication
   if (log.msg?.includes('Invalid API key') || log.msg?.includes('API key missing')) {
@@ -106,7 +106,7 @@ function checkSecurityEvent(log) {
  * Update state with security event
  */
 function updateState(event) {
-  if (!event) return;
+  if (!event) {return;}
 
   const now = Date.now();
   const windowMs = config.windowMinutes * 60 * 1000;
@@ -149,6 +149,11 @@ function updateState(event) {
     case 'csp_violation':
       state.cspViolations.push(event);
       state.cspViolations = state.cspViolations.filter((e) => now - e.timestamp < windowMs);
+      break;
+
+    default:
+      // Unknown event type - log and ignore
+      console.warn(`Unknown security event type: ${event.type}`);
       break;
   }
 }
@@ -222,9 +227,9 @@ function sendAlert(alert) {
   console.log(`Type: ${alert.type}`);
   console.log(`Message: ${alert.message}`);
   console.log(`Time: ${new Date().toISOString()}`);
-  if (alert.ip) console.log(`IP Address: ${alert.ip}`);
-  if (alert.origin) console.log(`Origin: ${alert.origin}`);
-  if (alert.paths) console.log(`Paths: ${alert.paths.join(', ')}`);
+  if (alert.ip) {console.log(`IP Address: ${alert.ip}`);}
+  if (alert.origin) {console.log(`Origin: ${alert.origin}`);}
+  if (alert.paths) {console.log(`Paths: ${alert.paths.join(', ')}`);}
   console.log('═══════════════════════════════════════════════════════════\n');
 
   // TODO: Integrate with alerting services
@@ -248,7 +253,7 @@ async function processLogs() {
     const lines = content.split('\n');
 
     for (const line of lines) {
-      if (!line.trim()) continue;
+      if (!line.trim()) {continue;}
       const log = parseLogLine(line);
       const event = checkSecurityEvent(log);
       if (event) {

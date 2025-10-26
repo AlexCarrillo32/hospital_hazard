@@ -85,10 +85,10 @@ export function getSSLConfig() {
 export function checkCertificateExpiration(certPath) {
   try {
     const cert = fs.readFileSync(certPath, 'utf8');
-    const certData = require('crypto').createPublicKey(cert);
-
-    // Extract certificate details
     // Note: This is a simplified check. For production, use a library like 'node-forge'
+    // to properly parse certificate and check expiration dates
+    require('crypto').createPublicKey(cert);
+
     logger.info({ certPath }, 'Certificate validation check');
 
     return {

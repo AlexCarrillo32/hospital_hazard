@@ -183,7 +183,7 @@ async function testCORS() {
       } else {
         logTest(`CORS - Origin: ${origin}`, true, 'Unauthorized origin blocked');
       }
-    } catch (error) {
+    } catch {
       // Network error is acceptable (CORS blocked)
       logTest(`CORS - Origin: ${origin}`, true, 'Request blocked by CORS');
     }
@@ -208,7 +208,7 @@ async function testRateLimiting() {
         logTest('Rate Limiting', true, `Rate limit enforced after ${i + 1} requests`);
         break;
       }
-    } catch (error) {
+    } catch {
       // Ignore
     }
   }
@@ -226,7 +226,7 @@ async function testAuthentication() {
 
   // Test without API key
   try {
-    const response = await fetch(`${BASE_URL}/api/waste-profiles/classify`, {
+    await fetch(`${BASE_URL}/api/waste-profiles/classify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ async function testAuthentication() {
 
   // Test with invalid API key
   try {
-    const response = await fetch(`${BASE_URL}/api/waste-profiles/classify`, {
+    await fetch(`${BASE_URL}/api/waste-profiles/classify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
