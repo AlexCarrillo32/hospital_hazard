@@ -2,7 +2,8 @@
 
 ## Overview
 
-This document outlines the security features, best practices, and configuration options for the Waste Compliance Agent API.
+This document outlines the security features, best practices, and configuration
+options for the Waste Compliance Agent API.
 
 ---
 
@@ -61,10 +62,7 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 router.post(
   '/classify',
   [
-    body('labReportText')
-      .trim()
-      .notEmpty()
-      .isLength({ min: 10, max: 50000 }),
+    body('labReportText').trim().notEmpty().isLength({ min: 10, max: 50000 }),
     handleValidationErrors,
   ],
   async (req, res, next) => {
@@ -79,11 +77,11 @@ router.post(
 
 **Tiers**:
 
-| Limiter         | Requests | Window     | Use Case                |
-| --------------- | -------- | ---------- | ----------------------- |
-| API Limiter     | 100      | 15 minutes | General API endpoints   |
-| Strict Limiter  | 10       | 15 minutes | Resource-intensive ops  |
-| Auth Limiter    | 5        | 15 minutes | Authentication attempts |
+| Limiter        | Requests | Window     | Use Case                |
+| -------------- | -------- | ---------- | ----------------------- |
+| API Limiter    | 100      | 15 minutes | General API endpoints   |
+| Strict Limiter | 10       | 15 minutes | Resource-intensive ops  |
+| Auth Limiter   | 5        | 15 minutes | Authentication attempts |
 
 **Features**:
 
@@ -129,7 +127,8 @@ router.get('/public-endpoint', optionalApiKey, handler);
 
 ### 6. Request Logging with Redaction
 
-**Location**: [src/middleware/requestLogger.js](../src/middleware/requestLogger.js)
+**Location**:
+[src/middleware/requestLogger.js](../src/middleware/requestLogger.js)
 
 **Features**:
 
@@ -153,7 +152,8 @@ router.get('/public-endpoint', optionalApiKey, handler);
 
 ### 7. Prototype Pollution Protection
 
-**Location**: [src/middleware/security.js:46-67](../src/middleware/security.js#L46-L67)
+**Location**:
+[src/middleware/security.js:46-67](../src/middleware/security.js#L46-L67)
 
 **Features**:
 
@@ -181,7 +181,6 @@ router.get('/public-endpoint', optionalApiKey, handler);
 ### Before Going to Production
 
 - [ ] **Environment Variables**
-
   - [ ] Set `NODE_ENV=production`
   - [ ] Configure `ALLOWED_ORIGINS` with production domains
   - [ ] Generate new `API_KEY` (never reuse dev keys)
@@ -190,28 +189,24 @@ router.get('/public-endpoint', optionalApiKey, handler);
   - [ ] Set `AI_MOCK_MODE=false` (if using real AI)
 
 - [ ] **HTTPS Configuration**
-
   - [ ] Enable HTTPS/TLS
   - [ ] Configure SSL certificates
   - [ ] Force HTTPS redirects
   - [ ] Update HSTS headers if needed
 
 - [ ] **Database Security**
-
   - [ ] Use encrypted connections (SSL/TLS)
   - [ ] Apply least-privilege access control
   - [ ] Enable audit logging
   - [ ] Regular backups with encryption
 
 - [ ] **API Keys**
-
   - [ ] Rotate all API keys
   - [ ] Store keys in secrets manager (AWS Secrets Manager, Vault, etc.)
   - [ ] Never log API keys
   - [ ] Implement key rotation schedule (90 days)
 
 - [ ] **Monitoring**
-
   - [ ] Set up intrusion detection
   - [ ] Configure CSP violation alerts
   - [ ] Monitor rate limit violations

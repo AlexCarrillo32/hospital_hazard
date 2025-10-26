@@ -25,7 +25,19 @@
     "generate-api-key": "node scripts/generate-api-key.js",
     "setup-ssl-dev": "node scripts/setup-ssl-dev.js",
     "security-monitor": "node scripts/security-monitoring.js",
-    "pentest": "node scripts/penetration-test.js"
+    "pentest": "node scripts/penetration-test.js",
+    "journal": "node scripts/journal.js",
+    "journal:start": "node scripts/journal.js start",
+    "journal:end": "node scripts/journal.js end",
+    "journal:status": "node scripts/journal.js status",
+    "journal:list": "node scripts/journal.js list",
+    "journal:started": "node scripts/journal.js started",
+    "journal:needed": "node scripts/journal.js needed",
+    "journal:note": "node scripts/journal.js note",
+    "journal:complete:started": "node scripts/journal.js complete:started",
+    "journal:complete:needed": "node scripts/journal.js complete:needed",
+    "journal:sync": "node scripts/journal.js sync",
+    "journal:help": "node scripts/journal.js help"
   },
   "keywords": [
     "hazardous-waste",

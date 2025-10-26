@@ -37,3 +37,6 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# Session journal (user-specific)
+.journal/

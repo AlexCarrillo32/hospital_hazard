@@ -1,6 +1,7 @@
 # Claude API Setup Guide
 
-This guide explains how to configure the Waste Compliance Agent to use the real Claude API instead of mock mode.
+This guide explains how to configure the Waste Compliance Agent to use the real
+Claude API instead of mock mode.
 
 ## Prerequisites
 
@@ -64,38 +65,50 @@ The application includes comprehensive error handling for Claude API:
 ### Common Errors
 
 #### Authentication Error (401)
+
 ```
 Error: Invalid API key or authentication failed
 ```
+
 **Solution**: Verify your API key in `.env` file
 
 #### Rate Limit Error (429)
+
 ```
 Error: Rate limit exceeded. Please try again later.
 ```
+
 **Solution**: Wait for the retry-after period or upgrade your plan
 
 #### Model Overloaded (529)
+
 ```
 Error: AI service is temporarily overloaded
 ```
-**Solution**: The system will automatically retry. If persistent, try again later.
+
+**Solution**: The system will automatically retry. If persistent, try again
+later.
 
 #### Timeout Error (408)
+
 ```
 Error: Request timed out after 60000ms
 ```
-**Solution**: Increase `AI_MODEL_TIMEOUT` in `.env` or check network connectivity
+
+**Solution**: Increase `AI_MODEL_TIMEOUT` in `.env` or check network
+connectivity
 
 ### Automatic Retry Logic
 
 The system automatically retries on:
+
 - Rate limit errors (with exponential backoff)
 - Model overload errors
 - Timeout errors
 - Network errors
 
 Retries are NOT attempted for:
+
 - Authentication errors (401)
 - Invalid requests (400)
 - Safety violations
@@ -105,10 +118,12 @@ Retries are NOT attempted for:
 ### Anthropic Rate Limits (as of 2024)
 
 **Free Tier:**
+
 - 5 requests per minute
 - 50,000 tokens per day
 
 **Paid Tier:**
+
 - 50 requests per minute
 - 500,000 tokens per day (varies by plan)
 
@@ -118,6 +133,7 @@ Retries are NOT attempted for:
 - Output: $15.00 per million tokens
 
 **Example cost calculation:**
+
 ```
 Waste classification request:
 - Input: ~500 tokens = $0.0015
@@ -146,6 +162,7 @@ curl http://localhost:3000/health/ai
 ```
 
 Response:
+
 ```json
 {
   "status": "available",
@@ -162,8 +179,8 @@ Enable caching to reduce API calls:
 ```javascript
 // Caching is enabled by default
 await claudeClient.generateCompletion(prompt, {
-  enableCache: true,  // Cache responses for 1 hour
-  cacheTtlMs: 3600000
+  enableCache: true, // Cache responses for 1 hour
+  cacheTtlMs: 3600000,
 });
 ```
 
@@ -173,30 +190,34 @@ Safety layer is enabled by default:
 
 ```javascript
 await claudeClient.generateCompletion(prompt, {
-  enableSafety: true,  // Filter PII and unsafe content
+  enableSafety: true, // Filter PII and unsafe content
 });
 ```
 
 ## Switching Between Mock and Production
 
 ### Development: Use Mock Mode
+
 ```bash
 AI_MOCK_MODE=true
 ```
 
 Benefits:
+
 - No API costs
 - Faster responses
 - No rate limits
 - Predictable outputs for testing
 
 ### Staging: Use Production API
+
 ```bash
 AI_MOCK_MODE=false
 ANTHROPIC_API_KEY=sk-ant-staging-key
 ```
 
 ### Production: Use Production API with Monitoring
+
 ```bash
 NODE_ENV=production
 AI_MOCK_MODE=false
@@ -231,6 +252,7 @@ npm start
 ```
 
 Look for:
+
 ```
 [claude-client] Running in MOCK mode  # Mock mode active
 [claude-client] Request succeeded     # API call successful

@@ -1,6 +1,7 @@
 # Deployment Guide - Waste Compliance Agent
 
-Complete guide for deploying the Waste Compliance Agent boilerplate to various environments.
+Complete guide for deploying the Waste Compliance Agent boilerplate to various
+environments.
 
 ---
 
@@ -612,7 +613,8 @@ pm2 start src/server.js -i max --name waste-compliance-agent
 - **Documentation**: `docs/` directory
 - **Security**: [docs/SECURITY.md](./SECURITY.md)
 - **SSL Setup**: [docs/SSL_SETUP.md](./SSL_SETUP.md)
-- **Production Checklist**: [docs/PRODUCTION_SECURITY_CHECKLIST.md](./PRODUCTION_SECURITY_CHECKLIST.md)
+- **Production Checklist**:
+  [docs/PRODUCTION_SECURITY_CHECKLIST.md](./PRODUCTION_SECURITY_CHECKLIST.md)
 
 ---
 

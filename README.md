@@ -184,6 +184,46 @@ This project follows strict development best practices defined in
 - `qcode` - Implement with tests, linting, formatting
 - `qcheck` - Perform skeptical code review
 
+## Documentation
+
+Comprehensive guides for deployment, integration, and development:
+
+- **[DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md)** - Complete deployment
+  instructions for all environments
+- **[INTEGRATION_CHECKLIST.md](./docs/INTEGRATION_CHECKLIST.md)** - Step-by-step
+  integration guide
+- **[PRODUCTION_SECURITY_CHECKLIST.md](./docs/PRODUCTION_SECURITY_CHECKLIST.md)** -
+  Pre-production security verification
+- **[SSL_SETUP.md](./docs/SSL_SETUP.md)** - SSL/TLS certificate setup guide
+- **[SECURITY.md](./docs/SECURITY.md)** - Security features and best practices
+- **[SESSION_JOURNAL.md](./docs/SESSION_JOURNAL.md)** - Track development
+  progress across sessions
+
+### Session Journal System
+
+Track your development progress with the built-in journal system:
+
+```bash
+# Start a new session
+npm run journal:start
+
+# Log your work
+npm run journal:started "Implementing feature X"
+npm run journal:needed "Add tests for feature Y"
+npm run journal:note "Important decision about Z"
+
+# Sync git commits
+npm run journal:sync
+
+# Check status
+npm run journal:status
+
+# End session
+npm run journal:end
+```
+
+See [SESSION_JOURNAL.md](./docs/SESSION_JOURNAL.md) for complete documentation.
+
 ## Security & Compliance
 
 - **CS-1**: Never auto-approve waste profiles without human review

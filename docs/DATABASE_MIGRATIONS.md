@@ -1,10 +1,13 @@
 # Database Migrations Guide
 
-This guide explains how to manage database schema changes using Knex.js migrations.
+This guide explains how to manage database schema changes using Knex.js
+migrations.
 
 ## Overview
 
-Database migrations provide version control for your database schema. They allow you to:
+Database migrations provide version control for your database schema. They allow
+you to:
+
 - Track schema changes over time
 - Roll back changes if needed
 - Share schema updates with your team
@@ -25,6 +28,7 @@ npm run migrate:status
 ```
 
 Output:
+
 ```
 Migrations:
   [✓] 20250124000001_create_waste_codes_table.js
@@ -221,6 +225,7 @@ export async function up(knex) {
 ### 5. Never Modify Existing Migrations
 
 Once deployed to production:
+
 - Never edit existing migration files
 - Create new migrations to fix issues
 - Maintain migration history integrity
@@ -256,16 +261,19 @@ docker-compose exec app npm run migrate:latest
 ### Migration Already Applied
 
 If you see this error:
+
 ```
 Migration "xxx" has already been run
 ```
 
 Check status:
+
 ```bash
 npm run migrate:status
 ```
 
 Force re-run (⚠️ dangerous):
+
 ```bash
 npm run migrate:rollback
 npm run migrate:latest
@@ -274,12 +282,14 @@ npm run migrate:latest
 ### Migration Failed Mid-Way
 
 1. Check database state:
+
 ```bash
 psql -U postgres waste_compliance
 \dt  -- List tables
 ```
 
 2. Manually rollback if needed:
+
 ```sql
 DELETE FROM knex_migrations WHERE name = 'failed_migration_name';
 ```
@@ -291,6 +301,7 @@ DELETE FROM knex_migrations WHERE name = 'failed_migration_name';
 Error: "Can't find migration file"
 
 Solution: Ensure migration files are committed to git:
+
 ```bash
 git add migrations/
 git commit -m "Add new migrations"

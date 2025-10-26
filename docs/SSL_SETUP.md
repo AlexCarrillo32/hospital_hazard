@@ -1,6 +1,7 @@
 # SSL/TLS Setup Guide
 
-Complete guide for setting up HTTPS/TLS certificates for the Waste Compliance Agent.
+Complete guide for setting up HTTPS/TLS certificates for the Waste Compliance
+Agent.
 
 ---
 
@@ -18,7 +19,8 @@ Complete guide for setting up HTTPS/TLS certificates for the Waste Compliance Ag
 
 ### Quick Start (Self-Signed Certificates)
 
-**⚠️ WARNING**: Self-signed certificates are for DEVELOPMENT ONLY. Never use in production!
+**⚠️ WARNING**: Self-signed certificates are for DEVELOPMENT ONLY. Never use in
+production!
 
 ```bash
 # Generate self-signed certificates
@@ -35,7 +37,8 @@ npm start
 
 Access your app at: `https://localhost:3000`
 
-**Browser Warning**: Your browser will show a security warning. This is expected for self-signed certificates.
+**Browser Warning**: Your browser will show a security warning. This is expected
+for self-signed certificates.
 
 - **Chrome/Edge**: Click "Advanced" → "Proceed to localhost (unsafe)"
 - **Firefox**: Click "Advanced" → "Accept the Risk and Continue"
@@ -253,7 +256,8 @@ The application is configured with secure ciphers:
 
 ### 2. Disable Old TLS Versions
 
-Only TLS 1.2 and TLS 1.3 are enabled. SSLv2, SSLv3, TLS 1.0, and TLS 1.1 are disabled.
+Only TLS 1.2 and TLS 1.3 are enabled. SSLv2, SSLv3, TLS 1.0, and TLS 1.1 are
+disabled.
 
 ### 3. Enable HSTS
 
@@ -265,7 +269,8 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
 ### 4. Use Certificate Transparency
 
-Modern browsers require Certificate Transparency (CT) logs. Let's Encrypt and most commercial CAs automatically include CT.
+Modern browsers require Certificate Transparency (CT) logs. Let's Encrypt and
+most commercial CAs automatically include CT.
 
 ### 5. Test Your SSL Configuration
 
@@ -369,7 +374,8 @@ PORT=8443
 
 - **Let's Encrypt**: https://letsencrypt.org/getting-started/
 - **Certbot**: https://certbot.eff.org/
-- **SSL Labs Best Practices**: https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices
+- **SSL Labs Best Practices**:
+  https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices
 - **Node.js HTTPS Module**: https://nodejs.org/api/https.html
 - **Mozilla SSL Configuration Generator**: https://ssl-config.mozilla.org/
 
@@ -385,5 +391,4 @@ For SSL/TLS issues, consult:
 
 ---
 
-**Last Updated**: 2025-01-25
-**Maintainer**: Waste Compliance Agent Team
+**Last Updated**: 2025-01-25 **Maintainer**: Waste Compliance Agent Team

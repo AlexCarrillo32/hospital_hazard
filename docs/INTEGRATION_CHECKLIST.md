@@ -1,6 +1,7 @@
 # Integration Checklist - Adding Waste Compliance Agent to Your Project
 
-Complete checklist for integrating the Waste Compliance Agent boilerplate into your existing project or deploying as a standalone service.
+Complete checklist for integrating the Waste Compliance Agent boilerplate into
+your existing project or deploying as a standalone service.
 
 ---
 
@@ -8,8 +9,10 @@ Complete checklist for integrating the Waste Compliance Agent boilerplate into y
 
 Choose the approach that best fits your needs:
 
-1. **[Standalone Microservice](#option-1-standalone-microservice)** - Deploy as independent API service
-2. **[Integrate into Existing Project](#option-2-integrate-into-existing-project)** - Add to monolithic application
+1. **[Standalone Microservice](#option-1-standalone-microservice)** - Deploy as
+   independent API service
+2. **[Integrate into Existing Project](#option-2-integrate-into-existing-project)** -
+   Add to monolithic application
 3. **[Docker Container](#option-3-docker-container)** - Containerized deployment
 
 ---
@@ -19,6 +22,7 @@ Choose the approach that best fits your needs:
 Deploy the Waste Compliance Agent as an independent API service.
 
 ### Prerequisites
+
 - [ ] Domain name or subdomain (e.g., `api-waste.yourdomain.com`)
 - [ ] Server or cloud instance (AWS, DigitalOcean, etc.)
 - [ ] PostgreSQL database
@@ -45,6 +49,7 @@ nano .env
 ```
 
 **Required Configuration:**
+
 ```bash
 NODE_ENV=production
 PORT=3000
@@ -124,9 +129,9 @@ async function classifyWaste(labReportText) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': API_KEY
+      'X-API-Key': API_KEY,
     },
-    body: JSON.stringify({ labReportText })
+    body: JSON.stringify({ labReportText }),
   });
   return response.json();
 }
@@ -141,16 +146,19 @@ const wasteAPI = {
   apiKey: process.env.REACT_APP_WASTE_API_KEY,
 
   async classifyWaste(labReportText) {
-    const response = await fetch(`${this.baseURL}/api/waste-profiles/classify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': this.apiKey
-      },
-      body: JSON.stringify({ labReportText })
-    });
+    const response = await fetch(
+      `${this.baseURL}/api/waste-profiles/classify`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.apiKey,
+        },
+        body: JSON.stringify({ labReportText }),
+      }
+    );
     return response.json();
-  }
+  },
 };
 ```
 
@@ -161,6 +169,7 @@ const wasteAPI = {
 Add the Waste Compliance Agent code to your existing Node.js application.
 
 ### Prerequisites
+
 - [ ] Existing Node.js/Express application
 - [ ] PostgreSQL database (can share with existing app)
 - [ ] Node.js 18+
@@ -215,7 +224,10 @@ import facilityRoutes from './modules/waste-compliance/routes/facility.js';
 import manifestRoutes from './modules/waste-compliance/routes/manifest.js';
 
 // Add security middleware
-import { securityHeaders, jsonSanitizer } from './modules/waste-compliance/middleware/security.js';
+import {
+  securityHeaders,
+  jsonSanitizer,
+} from './modules/waste-compliance/middleware/security.js';
 import { sanitizeInputs } from './modules/waste-compliance/middleware/validation.js';
 
 app.use(securityHeaders);
@@ -258,6 +270,7 @@ curl http://localhost:3000/api/waste-profiles/classify \
 Deploy as a Docker container alongside your existing services.
 
 ### Prerequisites
+
 - [ ] Docker installed
 - [ ] docker-compose (optional but recommended)
 - [ ] PostgreSQL (can use Docker container)
@@ -285,7 +298,7 @@ services:
     image: waste-compliance-agent:latest
     container_name: waste-compliance-api
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -347,13 +360,13 @@ services:
   waste-compliance-api:
     image: waste-compliance-agent:latest
     networks:
-      - your-existing-network  # Connect to your network
+      - your-existing-network # Connect to your network
     environment:
       # ... configuration
 
 networks:
   your-existing-network:
-    external: true  # Use existing network
+    external: true # Use existing network
 ```
 
 ---
@@ -361,6 +374,7 @@ networks:
 ## Post-Integration Checklist
 
 ### Functional Testing
+
 - [ ] Health check endpoint accessible
 - [ ] Waste classification working
 - [ ] Facility search working
@@ -369,6 +383,7 @@ networks:
 - [ ] All API endpoints responding
 
 ### Security Verification
+
 - [ ] API key authentication working
 - [ ] CORS configured correctly
 - [ ] SSL/TLS enabled (production)
@@ -378,6 +393,7 @@ networks:
 - [ ] Run: `npm run pentest`
 
 ### Performance
+
 - [ ] Response times acceptable
 - [ ] Database queries optimized
 - [ ] Connection pooling configured
@@ -385,6 +401,7 @@ networks:
 - [ ] Monitoring set up
 
 ### Documentation
+
 - [ ] API documentation updated
 - [ ] Team trained on new endpoints
 - [ ] Integration examples provided
@@ -539,7 +556,8 @@ grep API_KEY .env
 - **Deployment Guide**: [docs/DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 - **Security Guide**: [docs/SECURITY.md](./SECURITY.md)
 - **SSL Setup**: [docs/SSL_SETUP.md](./SSL_SETUP.md)
-- **Production Checklist**: [docs/PRODUCTION_SECURITY_CHECKLIST.md](./PRODUCTION_SECURITY_CHECKLIST.md)
+- **Production Checklist**:
+  [docs/PRODUCTION_SECURITY_CHECKLIST.md](./PRODUCTION_SECURITY_CHECKLIST.md)
 - **API Documentation**: `README.md`
 
 ---

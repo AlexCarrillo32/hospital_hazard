@@ -1,6 +1,7 @@
 # Production Security Checklist
 
-Complete security checklist for deploying the Waste Compliance Agent to production.
+Complete security checklist for deploying the Waste Compliance Agent to
+production.
 
 **Status Key**: ✅ Complete | ⏳ In Progress | ❌ Not Started
 
@@ -374,24 +375,25 @@ If a security incident occurs:
 
 ## Compliance Matrix
 
-| Requirement        | Status | Evidence                     |
-| ------------------ | ------ | ---------------------------- |
-| RCRA Compliance    | ⏳     | Manifest encryption, audits  |
-| Data Encryption    | ✅     | SSL/TLS, database encryption |
-| Access Control     | ✅     | API key authentication       |
-| Audit Logging      | ✅     | All requests logged          |
-| Incident Response  | ⏳     | Plan documented              |
-| Regular Audits     | ❌     | Schedule quarterly reviews   |
+| Requirement       | Status | Evidence                     |
+| ----------------- | ------ | ---------------------------- |
+| RCRA Compliance   | ⏳     | Manifest encryption, audits  |
+| Data Encryption   | ✅     | SSL/TLS, database encryption |
+| Access Control    | ✅     | API key authentication       |
+| Audit Logging     | ✅     | All requests logged          |
+| Incident Response | ⏳     | Plan documented              |
+| Regular Audits    | ❌     | Schedule quarterly reviews   |
 
 ---
 
 ## Sign-Off
 
-- [ ] **Security Team Lead**: \_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date: \_\_\_\_\_\_\_\_
+- [ ] **Security Team Lead**: \_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date:
+      \_\_\_\_\_\_\_\_
 - [ ] **DevOps Lead**: \_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date: \_\_\_\_\_\_\_\_
-- [ ] **CTO/Technical Lead**: \_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date: \_\_\_\_\_\_\_\_
+- [ ] **CTO/Technical Lead**: \_\_\_\_\_\_\_\_\_\_\_\_\_\_ Date:
+      \_\_\_\_\_\_\_\_
 
 ---
 
-**Last Updated**: 2025-01-25
-**Next Review**: 2025-04-25
+**Last Updated**: 2025-01-25 **Next Review**: 2025-04-25
