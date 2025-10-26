@@ -499,3 +499,163 @@ Follow this checklist for writing your commit message:
 [optional body]
 [optional footer(s)]
 ```
+
+---
+
+## Session Journal System
+
+### Purpose
+
+The Session Journal System tracks development progress across sessions to
+maintain context when switching between tasks or resuming work. It automatically
+captures commits, work in progress, and future tasks.
+
+### When to Use
+
+**SHOULD** use the journal system:
+
+- At the start of each development session
+- When making significant progress on a feature
+- Before switching context to another task
+- When planning future work
+- At the end of each development session
+
+**MUST** use the journal system:
+
+- For any work spanning multiple sessions
+- When collaborating and need to hand off context
+- When working on complex features requiring planning
+
+### Workflow Integration
+
+#### Starting a Session
+
+```bash
+# 1. Start a new session
+npm run journal:start
+
+# 2. Review previous session (if resuming work)
+npm run journal:list
+npm run journal:status
+
+# 3. Plan today's work
+npm run journal:needed "Add validation to manifest endpoints"
+npm run journal:needed "Write integration tests for facility matcher"
+```
+
+#### During Development
+
+```bash
+# Log when you start working on something
+npm run journal:started "Implementing rate limiting middleware"
+
+# After making commits, sync them to journal
+git commit -m "feat: add rate limiting"
+npm run journal:sync
+
+# Mark items complete when done
+npm run journal:complete:started <id>
+
+# Add notes about important decisions
+npm run journal:note "Using sliding window algorithm for rate limiting"
+```
+
+#### Ending a Session
+
+```bash
+# 1. Sync final commits
+npm run journal:sync
+
+# 2. Review what was accomplished
+npm run journal:status
+
+# 3. Plan next steps
+npm run journal:needed "Add rate limit configuration to environment"
+npm run journal:needed "Document rate limiting in API docs"
+
+# 4. End session
+npm run journal:end
+```
+
+### Best Practices
+
+#### Journal Entry Guidelines
+
+- **J-1 (SHOULD)** Start and end journal sessions for each work period
+- **J-2 (SHOULD)** Sync commits immediately after pushing to remote
+- **J-3 (SHOULD)** Use specific, actionable descriptions for started/needed
+  items
+- **J-4 (SHOULD)** Add notes for important architectural decisions
+- **J-5 (SHOULD)** Review journal status before ending a session
+- **J-6 (SHOULD)** Mark items as complete immediately after finishing them
+- **J-7 (SHOULD NOT)** Use vague descriptions like "Working on API" or "Fix
+  bugs"
+
+#### Description Format
+
+Good examples:
+
+```bash
+# ✅ Specific and actionable
+npm run journal:started "Adding rate limiting to /api/auth endpoints"
+npm run journal:needed "Write unit tests for wasteClassifier edge cases"
+npm run journal:note "Chose bcrypt over argon2 due to better ecosystem support"
+```
+
+Bad examples:
+
+```bash
+# ❌ Too vague
+npm run journal:started "Working on authentication"
+npm run journal:needed "Add tests"
+npm run journal:note "Made some changes"
+```
+
+### Command Reference
+
+| Command                    | Purpose              | Example                                      |
+| -------------------------- | -------------------- | -------------------------------------------- |
+| `journal:start`            | Start new session    | `npm run journal:start`                      |
+| `journal:end`              | End current session  | `npm run journal:end`                        |
+| `journal:status`           | Show current session | `npm run journal:status`                     |
+| `journal:list`             | List all sessions    | `npm run journal:list`                       |
+| `journal:started`          | Log work in progress | `npm run journal:started "description"`      |
+| `journal:needed`           | Log future work      | `npm run journal:needed "description"`       |
+| `journal:note`             | Add session note     | `npm run journal:note "decision or context"` |
+| `journal:sync`             | Sync git commits     | `npm run journal:sync`                       |
+| `journal:complete:started` | Mark started as done | `npm run journal:complete:started <id>`      |
+| `journal:complete:needed`  | Mark needed as done  | `npm run journal:complete:needed <id>`       |
+| `journal:help`             | Show help            | `npm run journal:help`                       |
+
+### Integration with Development Workflow
+
+The journal system integrates with existing shortcuts:
+
+**QCODE** (when implementing):
+
+```bash
+# After running tests and linting
+npm run journal:sync  # Sync any commits made
+npm run journal:complete:started <id>  # Mark feature complete
+```
+
+**QGIT** (when committing):
+
+```bash
+git add .
+git commit -m "feat: add feature X"
+git push
+npm run journal:sync  # Automatically capture commit in journal
+```
+
+### Data Storage
+
+- Journal data stored in `.journal/sessions.json`
+- **NOT** committed to git (in `.gitignore`)
+- User-specific development history
+- Safe to share with team if needed (contains no sensitive data)
+
+### Documentation
+
+For complete documentation, see
+[docs/SESSION_JOURNAL.md](./docs/SESSION_JOURNAL.md)
