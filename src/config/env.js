@@ -73,6 +73,21 @@ const envSchema = {
     default: 'info',
     enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
   },
+
+  // CORS Configuration
+  ALLOWED_ORIGINS: {
+    type: 'string',
+    required: false,
+    default: 'http://localhost:3000',
+  },
+
+  // API Security
+  API_KEY_SALT: {
+    type: 'string',
+    required: false,
+    default: null,
+    sensitive: true,
+  },
 };
 
 function parseValue(value, type) {
@@ -102,7 +117,8 @@ function validateEnv() {
   // Skip validation in test environment
   if (process.env.NODE_ENV === 'test') {
     return Object.entries(envSchema).reduce((acc, [key, schema]) => {
-      acc[key] = process.env[key] !== undefined ? parseValue(process.env[key], schema.type) : schema.default;
+      acc[key] =
+        process.env[key] !== undefined ? parseValue(process.env[key], schema.type) : schema.default;
       return acc;
     }, {});
   }

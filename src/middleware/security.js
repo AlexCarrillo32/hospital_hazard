@@ -3,14 +3,16 @@ import helmet from 'helmet';
 // Security middleware using helmet
 // Adds various HTTP headers to protect against common web vulnerabilities
 export const securityHeaders = helmet({
-  // Content Security Policy
+  // Content Security Policy with violation reporting
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
+      reportUri: '/api/csp-report', // CSP violation reporting endpoint
     },
+    reportOnly: false, // Set to true to test without blocking
   },
 
   // Strict Transport Security

@@ -117,9 +117,7 @@ export function parseAPIError(response, responseText) {
 
   // Model overloaded
   if (status === 529) {
-    return new ModelOverloadedError(
-      'AI service is temporarily overloaded. Please try again.'
-    );
+    return new ModelOverloadedError('AI service is temporarily overloaded. Please try again.');
   }
 
   // Server errors

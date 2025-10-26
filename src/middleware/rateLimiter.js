@@ -42,8 +42,7 @@ export const strictLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: {
-    error:
-      'Too many resource-intensive requests from this IP, please try again later.',
+    error: 'Too many resource-intensive requests from this IP, please try again later.',
   },
   handler: (req, res) => {
     logger.warn(
@@ -57,8 +56,7 @@ export const strictLimiter = rateLimit({
 
     res.status(429).json({
       error: 'Too many requests',
-      message:
-        'You have exceeded the rate limit for this resource. Please try again later.',
+      message: 'You have exceeded the rate limit for this resource. Please try again later.',
       retryAfter: res.getHeader('Retry-After'),
     });
   },
@@ -85,8 +83,7 @@ export const authLimiter = rateLimit({
 
     res.status(429).json({
       error: 'Too many authentication attempts',
-      message:
-        'Your account has been temporarily locked due to too many failed login attempts.',
+      message: 'Your account has been temporarily locked due to too many failed login attempts.',
       retryAfter: res.getHeader('Retry-After'),
     });
   },

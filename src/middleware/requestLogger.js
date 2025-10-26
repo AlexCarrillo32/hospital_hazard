@@ -3,6 +3,46 @@ import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('http');
 
+// Sensitive fields to redact from logs
+const SENSITIVE_FIELDS = [
+  'password',
+  'token',
+  'apiKey',
+  'api_key',
+  'secret',
+  'authorization',
+  'x-api-key',
+  'cookie',
+  'credit_card',
+  'ssn',
+];
+
+/**
+ * Redact sensitive data from objects before logging
+ */
+function redactSensitiveData(obj) {
+  if (!obj || typeof obj !== 'object') {
+    return obj;
+  }
+
+  const redacted = Array.isArray(obj) ? [] : {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    const lowerKey = key.toLowerCase();
+    const isSensitive = SENSITIVE_FIELDS.some((field) => lowerKey.includes(field));
+
+    if (isSensitive) {
+      redacted[key] = '***REDACTED***';
+    } else if (typeof value === 'object' && value !== null) {
+      redacted[key] = redactSensitiveData(value);
+    } else {
+      redacted[key] = value;
+    }
+  }
+
+  return redacted;
+}
+
 export function requestLogger(req, res, next) {
   // Generate unique request ID
   const requestId = uuidv4();
@@ -14,14 +54,27 @@ export function requestLogger(req, res, next) {
   // Log request start
   const startTime = Date.now();
 
+  // Redact sensitive headers
+  const safeHeaders = {};
+  for (const [key, value] of Object.entries(req.headers)) {
+    const lowerKey = key.toLowerCase();
+    const isSensitive = SENSITIVE_FIELDS.some((field) => lowerKey.includes(field));
+    if (isSensitive) {
+      safeHeaders[key] = '***REDACTED***';
+    } else {
+      safeHeaders[key] = value;
+    }
+  }
+
   logger.info(
     {
       requestId,
       method: req.method,
       path: req.path,
-      query: req.query,
+      query: redactSensitiveData(req.query),
       ip: req.ip,
       userAgent: req.get('user-agent'),
+      headers: safeHeaders,
     },
     'Incoming request'
   );

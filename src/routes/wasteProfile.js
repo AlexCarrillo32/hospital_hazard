@@ -1,36 +1,51 @@
 import express from 'express';
+import { body } from 'express-validator';
 import { classifyWaste, generateWasteProfile } from '../services/wasteClassifier.js';
+import { handleValidationErrors } from '../middleware/validation.js';
 
 const router = express.Router();
 
-router.post('/classify', async (req, res, next) => {
-  try {
-    const { labReportText } = req.body;
-
-    if (!labReportText) {
-      return res.status(400).json({ error: 'Lab report text is required' });
+router.post(
+  '/classify',
+  [
+    body('labReportText')
+      .trim()
+      .notEmpty()
+      .withMessage('Lab report text is required')
+      .isLength({ min: 10, max: 50000 })
+      .withMessage('Lab report text must be between 10 and 50000 characters'),
+    handleValidationErrors,
+  ],
+  async (req, res, next) => {
+    try {
+      const { labReportText } = req.body;
+      const classification = await classifyWaste(labReportText);
+      return res.json(classification);
+    } catch (error) {
+      return next(error);
     }
-
-    const classification = await classifyWaste(labReportText);
-    return res.json(classification);
-  } catch (error) {
-    return next(error);
   }
-});
+);
 
-router.post('/generate', async (req, res, next) => {
-  try {
-    const { classificationResult } = req.body;
-
-    if (!classificationResult) {
-      return res.status(400).json({ error: 'Classification result is required' });
+router.post(
+  '/generate',
+  [
+    body('classificationResult')
+      .notEmpty()
+      .withMessage('Classification result is required')
+      .isObject()
+      .withMessage('Classification result must be an object'),
+    handleValidationErrors,
+  ],
+  async (req, res, next) => {
+    try {
+      const { classificationResult } = req.body;
+      const profile = await generateWasteProfile(classificationResult);
+      return res.json(profile);
+    } catch (error) {
+      return next(error);
     }
-
-    const profile = await generateWasteProfile(classificationResult);
-    return res.json(profile);
-  } catch (error) {
-    return next(error);
   }
-});
+);
 
 export default router;
