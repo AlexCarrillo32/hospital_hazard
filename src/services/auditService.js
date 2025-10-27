@@ -1,5 +1,6 @@
 import { createLogger } from '../utils/logger.js';
-import { getPool as getDb } from '../db/connection.js';
+import { getKnex as getDb } from '../db/connection.js';
+import { randomUUID } from 'crypto';
 
 const logger = createLogger('audit-service');
 
@@ -12,23 +13,9 @@ export async function recordAudit(auditEntry) {
     action,
     resourceType,
     resourceId,
-    userId = 'system',
-    userEmail,
-    userRole = 'system',
-    ipAddress,
-    aiModel,
     traceId,
-    confidenceScore,
-    requiresHumanReview = false,
-    requestData,
-    responseData,
-    metadata,
-    wasteCode,
-    regulationReference,
-    complianceNotes,
     status = 'completed',
-    sessionId,
-    requestId,
+    metadata,
   } = auditEntry;
 
   // Validate required fields
@@ -36,36 +23,21 @@ export async function recordAudit(auditEntry) {
     throw new Error('Missing required audit fields: eventType, action, resourceType');
   }
 
-  // Sanitize sensitive data from request/response
-  const sanitizedRequest = sanitizeData(requestData);
-  const sanitizedResponse = sanitizeData(responseData);
-
   const db = getDb();
+
+  const auditId = randomUUID();
 
   try {
     const [result] = await db('audit_trail')
       .insert({
+        id: auditId,
         event_type: eventType,
         action,
         resource_type: resourceType,
         resource_id: resourceId,
-        user_id: userId,
-        user_email: userEmail,
-        user_role: userRole,
-        ip_address: ipAddress,
-        ai_model: aiModel,
         trace_id: traceId,
-        confidence_score: confidenceScore,
-        requires_human_review: requiresHumanReview,
-        request_data: sanitizedRequest ? JSON.stringify(sanitizedRequest) : null,
-        response_data: sanitizedResponse ? JSON.stringify(sanitizedResponse) : null,
-        metadata: metadata ? JSON.stringify(metadata) : null,
-        waste_code: wasteCode,
-        regulation_reference: regulationReference,
-        compliance_notes: complianceNotes,
         status,
-        session_id: sessionId,
-        request_id: requestId,
+        metadata: metadata ? JSON.stringify(metadata) : null,
       })
       .returning('*');
 
@@ -414,28 +386,6 @@ export async function generateAuditReport(startDate, endDate) {
     );
     throw error;
   }
-}
-
-/**
- * Sanitize data to remove sensitive information
- */
-function sanitizeData(data) {
-  if (!data) {
-    return null;
-  }
-
-  const sanitized = { ...data };
-
-  // Remove common sensitive fields
-  const sensitiveFields = ['password', 'token', 'apiKey', 'secret', 'ssn', 'creditCard'];
-
-  for (const field of sensitiveFields) {
-    if (sanitized[field]) {
-      sanitized[field] = '[REDACTED]';
-    }
-  }
-
-  return sanitized;
 }
 
 /**

@@ -1,4 +1,5 @@
 import pg from 'pg';
+import knex from 'knex';
 import dotenv from 'dotenv';
 import { createLogger } from '../utils/logger.js';
 
@@ -22,6 +23,7 @@ const dbConfig = {
 
 // Create connection pool
 let pool = null;
+let knexInstance = null;
 
 export function getPool() {
   if (!pool) {
@@ -37,6 +39,21 @@ export function getPool() {
   }
 
   return pool;
+}
+
+export function getKnex() {
+  if (!knexInstance) {
+    knexInstance = knex({
+      client: 'pg',
+      connection: dbConfig,
+      pool: {
+        min: 2,
+        max: 10,
+      },
+    });
+  }
+
+  return knexInstance;
 }
 
 export async function query(text, params) {
