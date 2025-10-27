@@ -1,7 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 import { EPA_WASTE_CODES } from '../src/data/epaWasteCodes.js';
-import { MOCK_FACILITIES } from '../src/services/facilityMatcher.js';
+import { TSDF_FACILITIES } from '../src/data/facilityData.js';
 
 dotenv.config();
 
@@ -49,7 +49,7 @@ async function seedFacilities(client) {
   console.log('\n🏭 Seeding disposal facilities...');
   let count = 0;
 
-  for (const facility of MOCK_FACILITIES) {
+  for (const facility of TSDF_FACILITIES) {
     await client.query(
       `INSERT INTO facilities (
         id, name, epa_id, address, city, state, zip_code,
@@ -73,21 +73,21 @@ async function seedFacilities(client) {
       [
         facility.id,
         facility.name,
-        facility.epaId,
+        facility.epa_id,
         facility.address,
-        facility.city || extractCity(facility.address),
+        facility.city,
         facility.state,
-        facility.zipCode || extractZip(facility.address),
-        facility.location.lat,
-        facility.location.lng,
-        JSON.stringify(facility.acceptedWasteCodes),
-        facility.pricePerKg,
-        facility.maxCapacityKg,
-        facility.currentCapacityKg || 0,
+        facility.zip_code,
+        facility.latitude,
+        facility.longitude,
+        JSON.stringify(facility.accepted_waste_codes),
+        facility.price_per_kg,
+        facility.max_capacity_kg,
+        facility.current_capacity_kg || 0,
         JSON.stringify(facility.certifications),
         facility.rating,
-        facility.phone || '(555) 000-0000',
-        facility.email || `contact@${facility.id}.example.com`,
+        facility.phone,
+        facility.email,
       ]
     );
     count++;
@@ -210,15 +210,16 @@ async function seedDatabase() {
   }
 }
 
-function extractCity(address) {
-  const parts = address.split(',');
-  return parts.length >= 2 ? parts[parts.length - 2].trim() : 'Unknown';
-}
+// Utility functions (kept for potential future use)
+// function extractCity(address) {
+//   const parts = address.split(',');
+//   return parts.length >= 2 ? parts[parts.length - 2].trim() : 'Unknown';
+// }
 
-function extractZip(address) {
-  const zipMatch = address.match(/\d{5}/);
-  return zipMatch ? zipMatch[0] : '00000';
-}
+// function extractZip(address) {
+//   const zipMatch = address.match(/\d{5}/);
+//   return zipMatch ? zipMatch[0] : '00000';
+// }
 
 // Export MOCK_FACILITIES for seeding
 export const MOCK_FACILITIES_EXPORT = [

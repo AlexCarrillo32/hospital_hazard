@@ -1,5 +1,5 @@
 import { createLogger } from '../utils/logger.js';
-import { getDb } from '../db/connection.js';
+import { getPool as getDb } from '../db/connection.js';
 
 const logger = createLogger('audit-service');
 
