@@ -3,9 +3,16 @@
  * @returns { Promise<void> }
  */
 export function up(knex) {
+  const isPostgres = knex.client.config.client === 'pg';
+  const isSQLite = knex.client.config.client === 'sqlite3';
+
   return knex.schema.createTable('audit_trail', (table) => {
-    // Primary key
-    table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
+    // Primary key - PostgreSQL uses UUID, SQLite uses TEXT
+    if (isPostgres) {
+      table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
+    } else {
+      table.uuid('id').primary();
+    }
 
     // Audit metadata
     table.timestamp('timestamp').notNullable().defaultTo(knex.fn.now());
@@ -18,7 +25,13 @@ export function up(knex) {
     table.string('user_id', 255); // User who performed the action
     table.string('user_email', 255);
     table.string('user_role', 100); // admin, ehs_director, operator, system
-    table.inet('ip_address'); // IPv4 or IPv6
+
+    // IP address - PostgreSQL uses inet type, SQLite uses string
+    if (isPostgres) {
+      table.specificType('ip_address', 'inet'); // IPv4 or IPv6
+    } else {
+      table.string('ip_address', 45); // Max length for IPv6
+    }
 
     // AI-specific fields
     table.string('ai_model', 100); // Model used for AI operations
@@ -29,10 +42,16 @@ export function up(knex) {
     table.timestamp('reviewed_at');
     table.string('reviewed_by', 255);
 
-    // Request/Response data
-    table.jsonb('request_data'); // Input data (sanitized)
-    table.jsonb('response_data'); // Output data (sanitized)
-    table.jsonb('metadata'); // Additional context (errors, warnings, etc.)
+    // Request/Response data - PostgreSQL uses jsonb, SQLite uses json (text)
+    if (isPostgres) {
+      table.jsonb('request_data'); // Input data (sanitized)
+      table.jsonb('response_data'); // Output data (sanitized)
+      table.jsonb('metadata'); // Additional context (errors, warnings, etc.)
+    } else {
+      table.json('request_data'); // Input data (sanitized)
+      table.json('response_data'); // Output data (sanitized)
+      table.json('metadata'); // Additional context (errors, warnings, etc.)
+    }
 
     // Compliance fields
     table.string('waste_code', 20); // EPA waste code (D001, F001, etc.)

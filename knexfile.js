@@ -22,17 +22,18 @@ const config = {
   },
 
   test: {
-    client: 'pg',
+    client: 'sqlite3',
     connection: {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME || 'waste_compliance_test',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || '',
+      filename: './test.sqlite3',
     },
+    useNullAsDefault: true,
     migrations: {
       directory: './migrations',
       tableName: 'knex_migrations',
+    },
+    pool: {
+      min: 1,
+      max: 1,
     },
   },
 

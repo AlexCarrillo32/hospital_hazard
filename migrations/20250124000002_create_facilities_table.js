@@ -4,6 +4,8 @@
  * @returns {Promise<void>}
  */
 export function up(knex) {
+  const isPostgres = knex.client.config.client === 'pg';
+
   return knex.schema.createTable('facilities', (table) => {
     table.string('id', 50).primary();
     table.string('name', 255).notNullable();
@@ -14,11 +16,23 @@ export function up(knex) {
     table.string('zip_code', 10);
     table.decimal('latitude', 10, 7);
     table.decimal('longitude', 10, 7);
-    table.jsonb('accepted_waste_codes');
+
+    if (isPostgres) {
+      table.jsonb('accepted_waste_codes');
+    } else {
+      table.json('accepted_waste_codes');
+    }
+
     table.decimal('price_per_kg', 10, 2);
     table.integer('max_capacity_kg');
     table.integer('current_capacity_kg').defaultTo(0);
-    table.jsonb('certifications');
+
+    if (isPostgres) {
+      table.jsonb('certifications');
+    } else {
+      table.json('certifications');
+    }
+
     table.decimal('rating', 3, 2).defaultTo(0);
     table.string('phone', 20);
     table.string('email', 255);

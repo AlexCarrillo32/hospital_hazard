@@ -8,4 +8,5 @@ export default {
   moduleFileExtensions: ['js', 'json'],
   verbose: true,
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  maxWorkers: 1, // Run tests serially to avoid SQLite file locking issues
 };

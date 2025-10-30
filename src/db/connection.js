@@ -2,12 +2,16 @@ import pg from 'pg';
 import knex from 'knex';
 import dotenv from 'dotenv';
 import { createLogger } from '../utils/logger.js';
+import knexConfig from '../../knexfile.js';
 
 dotenv.config();
 
 const logger = createLogger('database');
 
 const { Pool } = pg;
+
+// Get environment (test, development, production)
+const environment = process.env.NODE_ENV || 'development';
 
 // Database configuration
 const dbConfig = {
@@ -26,6 +30,12 @@ let pool = null;
 let knexInstance = null;
 
 export function getPool() {
+  // Don't create PostgreSQL pool for SQLite test environment
+  if (environment === 'test' && knexConfig[environment].client === 'sqlite3') {
+    logger.warn('PostgreSQL pool not available in SQLite test mode');
+    return null;
+  }
+
   if (!pool) {
     pool = new Pool(dbConfig);
 
@@ -43,20 +53,47 @@ export function getPool() {
 
 export function getKnex() {
   if (!knexInstance) {
-    knexInstance = knex({
-      client: 'pg',
-      connection: dbConfig,
-      pool: {
-        min: 2,
-        max: 10,
-      },
-    });
+    // Use knexfile configuration based on environment
+    knexInstance = knex(knexConfig[environment]);
   }
 
   return knexInstance;
 }
 
 export async function query(text, params) {
+  // Use Knex for SQLite test mode
+  if (environment === 'test' && knexConfig[environment].client === 'sqlite3') {
+    const db = getKnex();
+    const start = Date.now();
+
+    try {
+      const result = await db.raw(text, params);
+      const duration = Date.now() - start;
+
+      logger.debug(
+        {
+          text,
+          duration,
+          rows: result.length,
+        },
+        'Executed database query'
+      );
+
+      return { rows: result };
+    } catch (error) {
+      logger.error(
+        {
+          text,
+          params,
+          error: error.message,
+        },
+        'Database query error'
+      );
+      throw error;
+    }
+  }
+
+  // Use PostgreSQL pool for development/production
   const client = getPool();
   const start = Date.now();
 
@@ -88,11 +125,24 @@ export async function query(text, params) {
 }
 
 export async function getClient() {
-  return getPool().connect();
+  const pool = getPool();
+  if (!pool) {
+    throw new Error('PostgreSQL pool not available in test mode');
+  }
+  return pool.connect();
 }
 
 export async function testConnection() {
   try {
+    // Use Knex for SQLite test mode
+    if (environment === 'test' && knexConfig[environment].client === 'sqlite3') {
+      const db = getKnex();
+      await db.raw('SELECT 1');
+      logger.info('Database connection successful (SQLite test mode)');
+      return true;
+    }
+
+    // Use PostgreSQL for development/production
     const result = await query('SELECT NOW() as now, current_database() as database');
     logger.info(
       {
@@ -109,6 +159,11 @@ export async function testConnection() {
 }
 
 export async function closePool() {
+  if (knexInstance) {
+    await knexInstance.destroy();
+    knexInstance = null;
+    logger.info('Knex connection closed');
+  }
   if (pool) {
     await pool.end();
     pool = null;
