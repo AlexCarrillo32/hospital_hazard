@@ -44,7 +44,7 @@ describe('manifestGenerator', () => {
         expect.objectContaining({
           id: expect.any(String),
           manifestNumber: expect.stringMatching(/^EPA-\d+-[A-Z0-9]+$/),
-          status: 'created',
+          status: 'draft',
           wasteProfile: expect.any(Object),
           generator: expect.any(Object),
           facility: expect.any(Object),
@@ -253,21 +253,21 @@ describe('manifestGenerator', () => {
     });
 
     it('should update manifest status', async () => {
-      const result = await updateManifestStatus(testManifestId, 'in_transit');
+      const result = await updateManifestStatus(testManifestId, 'submitted');
 
-      expect(result.status).toBe('in_transit');
+      expect(result.status).toBe('submitted');
     });
 
     it('should add audit trail entry when updating status', async () => {
-      const result = await updateManifestStatus(testManifestId, 'in_transit');
+      const result = await updateManifestStatus(testManifestId, 'submitted');
 
       const statusEvent = result.auditTrail.find(
-        (event) => event.action === 'status_changed_created_to_in_transit'
+        (event) => event.action === 'status_changed_draft_to_submitted'
       );
 
       expect(statusEvent).toBeDefined();
-      expect(statusEvent.details.previousStatus).toBe('created');
-      expect(statusEvent.details.newStatus).toBe('in_transit');
+      expect(statusEvent.details.previousStatus).toBe('draft');
+      expect(statusEvent.details.newStatus).toBe('submitted');
     });
   });
 });
