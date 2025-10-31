@@ -40,3 +40,6 @@ temp/
 
 # Session journal (user-specific)
 .journal/
+
+# Vercel
+.vercel

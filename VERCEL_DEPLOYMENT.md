@@ -1,10 +1,17 @@
 # Vercel Deployment Guide
 
-## Quick Fix Applied
+## Quick Fixes Applied
 
 ✅ **Fixed**: Changed `package.json` engines from `"node": ">=18.0.0"` to `"node": "20.x"`
+- Prevents automatic upgrades to new major Node.js versions that might have breaking changes
 
-This prevents automatic upgrades to new major Node.js versions that might have breaking changes.
+✅ **Fixed**: Updated Vercel configuration to modern format
+- Uses `rewrites` instead of deprecated `builds` configuration
+- Entry point: `api/index.js` (serverless function wrapper)
+- No more "unused build settings" warnings
+
+✅ **Fixed**: Upgraded `supertest` from `^6.3.3` to `^7.1.3`
+- Eliminates deprecation warnings during npm install
 
 ---
 
