@@ -86,6 +86,148 @@ rules are strongly recommended.
 
 ---
 
+### 6.1 — CI/CD Best Practices
+
+**Critical**: Always ensure CI/CD pipeline passes from the very beginning. Broken CI wastes time and blocks deployments.
+
+#### Pre-Commit Checklist (MUST DO EVERY TIME)
+
+Before committing ANY code, run these commands locally:
+
+```bash
+# 1. Format code
+npm run format
+
+# 2. Lint (must have 0 errors, warnings OK up to limit)
+npm run lint
+
+# 3. Run all tests
+npm test
+
+# 4. Check git status
+git status
+```
+
+**NEVER commit code without running these checks first.**
+
+#### CI/CD Pipeline Understanding
+
+- **CI-1 (MUST)** Understand what the CI/CD pipeline checks before committing
+- **CI-2 (MUST)** Run the same checks locally that CI will run
+- **CI-3 (MUST)** Fix CI failures immediately, don't commit more code on top
+- **CI-4 (SHOULD)** Check CI status after pushing before moving to next task
+
+#### Common CI/CD Failures and Prevention
+
+**Linting Failures**:
+- **Cause**: ESLint errors or exceeding warning threshold
+- **Prevention**: Always run `npm run lint` before committing
+- **Fix**: Run `npm run lint:fix` to auto-fix, then manually fix remaining issues
+
+**Test Failures**:
+- **Cause**: Broken tests, missing test data, environment issues
+- **Prevention**: Always run `npm test` before committing
+- **Fix**: Debug failing tests locally before pushing fix
+
+**Format Failures**:
+- **Cause**: Code not formatted with Prettier
+- **Prevention**: Always run `npm run format` before committing
+- **Fix**: Run `npm run format` and commit the changes
+
+**Build Failures**:
+- **Cause**: Missing files, broken imports, TypeScript errors
+- **Prevention**: Ensure all files are committed, imports are correct
+- **Fix**: Check error logs, fix import paths, add missing files
+
+#### ESLint Configuration for Test Files
+
+Test files have different nesting requirements than production code:
+
+- **Production code**: max 3 nested callbacks
+- **Test files**: max 5 nested callbacks (Jest describe/it blocks)
+
+This is configured in `eslint.config.js`:
+
+```javascript
+// Test files - allow more nested callbacks
+{
+  files: ['**/*.test.js', '**/*.spec.js', '**/tests/**/*.js'],
+  rules: {
+    'max-nested-callbacks': ['warn', 5],
+  },
+}
+```
+
+#### CI/CD Warning Limits
+
+The CI pipeline allows up to **50 ESLint warnings** before failing:
+
+```yaml
+# .github/workflows/ci.yml
+- name: Run ESLint
+  run: npm run lint -- --max-warnings 50
+```
+
+**Important**:
+- Current project has ~43 warnings
+- Only 7 warnings of buffer before CI fails
+- Don't add new warnings without fixing existing ones
+
+#### When CI Fails After Push
+
+1. **Check GitHub Actions tab** to see exact error
+2. **Pull latest code** if working in a team
+3. **Reproduce locally**: Run the exact command that failed
+4. **Fix the issue** in a new commit
+5. **Verify locally**: Run all checks again
+6. **Push the fix**: Push immediately to unblock pipeline
+
+#### Integration with QCODE and QGIT
+
+**Enhanced QCODE**:
+```bash
+# Implement your plan
+# Write tests
+npm test                    # ← MUST pass
+npm run lint               # ← MUST pass (or only warnings)
+npm run format             # ← MUST run
+```
+
+**Enhanced QGIT**:
+```bash
+# Before committing
+npm run format             # ← Format code
+npm run lint               # ← Check linting
+npm test                   # ← Run tests
+git status                 # ← Review changes
+git add .                  # ← Stage changes
+git commit -m "..."        # ← Commit with conventional format
+git push                   # ← Push to remote
+
+# After pushing
+# → Check GitHub Actions tab to verify CI passes
+```
+
+#### CI/CD Monitoring
+
+- **M-1 (SHOULD)** Check CI status within 5 minutes of pushing
+- **M-2 (MUST)** Fix failing CI before starting new work
+- **M-3 (SHOULD)** Enable GitHub notifications for CI failures
+- **M-4 (SHOULD)** Review CI logs even when passing to catch warnings
+
+#### Project-Specific CI Jobs
+
+This project has 4 CI jobs that run on every push:
+
+1. **Lint Code** - Checks ESLint and Prettier (8 seconds)
+2. **Run Tests** - Runs full test suite with PostgreSQL (30 seconds)
+3. **Build Check** - Verifies project structure (5 seconds)
+4. **Security Audit** - Runs npm audit (10 seconds)
+
+All must pass before merging to main branch.
+
+---
+
 ### 6.5 — Linting Best Practices
 
 #### Variables & Declarations
