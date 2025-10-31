@@ -4,7 +4,6 @@
  */
 export function up(knex) {
   const isPostgres = knex.client.config.client === 'pg';
-  const isSQLite = knex.client.config.client === 'sqlite3';
 
   return knex.schema.createTable('audit_trail', (table) => {
     // Primary key - PostgreSQL uses UUID, SQLite uses TEXT
