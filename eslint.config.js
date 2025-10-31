@@ -88,6 +88,13 @@ export default [
       'max-params': ['warn', 5],
     },
   },
+  // Test files - allow more nested callbacks for Jest describe/it blocks
+  {
+    files: ['**/*.test.js', '**/*.spec.js', '**/tests/**/*.js'],
+    rules: {
+      'max-nested-callbacks': ['warn', 5], // Allow more nesting in tests
+    },
+  },
   {
     ignores: [
       'node_modules/',
