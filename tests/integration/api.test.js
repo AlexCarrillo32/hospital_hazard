@@ -247,7 +247,7 @@ describe('API Integration Tests', () => {
         expect.objectContaining({
           id: expect.any(String),
           manifestNumber: expect.stringMatching(/^EPA-/),
-          status: 'created',
+          status: 'draft',
           wasteProfile: expect.any(Object),
           generator: expect.any(Object),
           facility: expect.any(Object),
@@ -336,7 +336,7 @@ describe('API Integration Tests', () => {
         });
 
       expect(manifestResponse.status).toBe(201);
-      expect(manifestResponse.body.status).toBe('created');
+      expect(manifestResponse.body.status).toBe('draft');
     });
   });
 });
